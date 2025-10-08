@@ -2,9 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
-    pass
-     
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    email = models.EmailField()
+    bio = models.TextField(blank=True)
 
-
-
-# Create your models here.
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
