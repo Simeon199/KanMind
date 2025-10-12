@@ -1,15 +1,12 @@
 # app/auth_user_views.py
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from .serializers import RegistrationSerializer
 from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 class RegistrationView(APIView):
     permission_classes=[AllowAny]
@@ -54,13 +51,11 @@ class RegistrationView(APIView):
     #     return Response(data)
     
 
-class LoginView(ObtainAuthToken):
+class CustomLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        data = {}
-
+        serializer = AuthTokenSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
             token, created = Token.objects.get_or_create(user=user)
@@ -69,7 +64,5 @@ class LoginView(ObtainAuthToken):
                 'username': user.username,
                 'email': user.email
             }
-        else:
-            data=serializer.errors
-
-        return Response(data)
+            return Response(data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -33,15 +33,3 @@ class RegistrationSerializer(serializers.ModelSerializer):
         account.set_password(password)
         account.save()
         return account
-    
-# class LoginViewSerializer(serializers.Serializer):
-#     username = serializers.URLField()
-#     password = serializers.CharField(write_only=True)
-
-#     def validate(self, data):
-#         user = User.objects.get(username=data['username'])
-
-#         # Additional validation logic (e.g. password confirmation)
-#         if not data['password'] or not user.check_password(data['password']):
-#             raise serializers.ValidationError("Invalid username or password")
-#         return data
