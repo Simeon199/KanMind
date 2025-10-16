@@ -12,7 +12,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=User
-        fields = ['username', 'email', 'password', 'repeated_password']
+        fields = ['fullname', 'email', 'password', 'repeated_password']
         extra_kwargs = {
             'password': {
                 'write_only': True
@@ -29,7 +29,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=self.validated_data['email']).exists():
             raise serializers.ValidationError('Email already exists')
         
-        account = User(email=self.validated_data['email'], username=self.validated_data['username'])
+        account = User(email=self.validated_data['email'], fullname=self.validated_data['fullname'])
         account.set_password(password)
         account.save()
         return account

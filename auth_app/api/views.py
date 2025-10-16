@@ -7,6 +7,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework import generics, status
 
+def get_token_response(user):
+    token, created = Token.objects.get_or_create(user=user)
+    return {
+        'token': token.key,
+        'fullname': user.fullname,
+        'email': user.email,
+        'user_id': user.user_id
+    }
 
 class RegistrationView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
@@ -19,12 +27,7 @@ class RegistrationView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        token, created = Token.objects.get_or_create(user=user)
-        data = {
-            'token': token.key,
-            'username': user.username,
-            'email': user.email
-        }
+        data = get_token_response(user)
         return Response(data, status=201)
     
 class CustomLoginView(APIView):
@@ -37,11 +40,6 @@ class CustomLoginView(APIView):
         serializer = AuthTokenSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
-            token, created = Token.objects.get_or_create(user=user)
-            data = {
-                'token': token.key,
-                'username': user.username,
-                'email': user.email
-            }
+            data = get_token_response(user)
             return Response(data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
