@@ -1,24 +1,26 @@
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, CustomAuthTokenSerializer
+from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.serializers import AuthTokenSerializer
+# from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework import generics, status
 
 def get_token_response(user):
     token, created = Token.objects.get_or_create(user=user)
     return {
         'token': token.key,
-        'fullname': user.fullname,
+        'fullname': user.username, # Ehemals fullname
         'email': user.email,
-        'user_id': user.user_id
+        'user_id': user.id # Ehemals user.user_id
     }
 
 class RegistrationView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
     permission_classes = [AllowAny]
+    queryset = User.objects.all()
 
     def get(self, request):
         return Response({"message": "Registration form"})
@@ -32,12 +34,12 @@ class RegistrationView(generics.CreateAPIView):
     
 class CustomLoginView(APIView):
     permission_classes = [AllowAny]
-
+    
     def get(self, request):
         return Response({"message": "Login form"})
 
     def post(self, request):
-        serializer = AuthTokenSerializer(data=request.data)
+        serializer = CustomAuthTokenSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
             data = get_token_response(user)

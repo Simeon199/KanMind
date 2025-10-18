@@ -7,7 +7,6 @@ from rest_framework.authentication import TokenAuthentication, BaseAuthenticatio
 from rest_framework import exceptions
 from django.utils.translation import gettext_lazy as _
 
-
 class TokenAdminAuthentication(TokenAuthentication):
 
     def authenticate(self, request):
@@ -15,7 +14,6 @@ class TokenAdminAuthentication(TokenAuthentication):
             msg = _('User must be Admin!')
             raise exceptions.AuthenticationFailed(msg)
         return super().authenticate(request)
-    
 
 class BoardView(generics.ListCreateAPIView):
     queryset = Board.objects.all()
