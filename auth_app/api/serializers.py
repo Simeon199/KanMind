@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-# from rest_framework.authtoken.serializers import AuthTokenSerializer 
 from auth_app.models import UserProfile
 from django.contrib.auth.models import User
 
@@ -39,7 +38,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         account.save()
         return account
     
-class CustomAuthTokenSerializer(serializers.Serializer): # Ehemals AuthTokenSerializer
+class CustomAuthTokenSerializer(serializers.Serializer): 
     email = serializers.EmailField(label="email", write_only=True)
     password = serializers.CharField(label="password", style={'input_type': 'password'}, trim_whitespace=False, write_only=True)
     
@@ -59,10 +58,3 @@ class CustomAuthTokenSerializer(serializers.Serializer): # Ehemals AuthTokenSeri
         
         attrs['user'] = user
         return attrs
-    
-    # fullname = serializers.CharField(label='fullname', write_only=True)
-    # username = None
-
-    # def validate(self, attrs):
-    #     attrs['username'] = attrs.pop('fullname')
-    #     return super().validate(attrs)
