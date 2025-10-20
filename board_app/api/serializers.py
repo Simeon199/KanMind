@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from board_app.models import Board
-from django.contrib.auth.models import User
 
 class BoardSerializer(serializers.ModelSerializer):
+        owner_id = serializers.SerializerMethodField()
         class Meta:
             model = Board
-            fields = ['title', 'members']
+            # fields = ['title', 'members']
+
+        def get_owner_id(self, obj: Board):
+              return obj.owner.id
