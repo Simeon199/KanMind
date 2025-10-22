@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'board_app'
 ]
 
+    # corsheaders hinzufügen um CORS-Fehler zu vermeiden
+    # 'corsheaders' 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -50,8 +53,11 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
+
+# 'corsheaders.middleware.CorsMiddleware',
+# 'django.middleware.commmon.CommonMiddleware'
 
 ROOT_URLCONF = 'core.urls'
 
@@ -133,3 +139,23 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+# Neu hinzugefügt (Zur Vermeidung von CORS-Fehlern) - Erstmal NUR für Entwicklungszwecke
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8000"
+# ]
+
+# Optionale (zusätzliche) Änderungen 
+
+# CORS_ALLOW_METHODS = [
+#     'GET',
+#     'POST',
+#     'PUT',
+#     'DELETE'
+# ]
+
+# CORS_ALLOW_HEADERS = [
+#     'Content-Type',
+#     'Authorization',
+# ]
