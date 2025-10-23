@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 class BoardView(generics.ListCreateAPIView):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
-    permission_classes = [IsAuthenticated] # OwnerOfBoardPermission
+    permission_classes = [IsAuthenticated]
 
 class BoardRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Board.objects.all()
