@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'auth_app',
-    'board_app'
+    'board_app',
+    'tasks_app'
 ]
 
     # corsheaders hinzufügen um CORS-Fehler zu vermeiden
