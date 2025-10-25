@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders', # New Line
+    # 'django_cors_extensions',
     'rest_framework',
     'rest_framework.authtoken',
     'auth_app',
@@ -53,6 +55,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # New Line: corsheaders added
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
@@ -143,9 +146,10 @@ REST_FRAMEWORK = {
 
 # Neu hinzugefügt (Zur Vermeidung von CORS-Fehlern) - Erstmal NUR für Entwicklungszwecke
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8000"
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:5500"
+]
 
 # Optionale (zusätzliche) Änderungen 
 
