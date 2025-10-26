@@ -1,30 +1,29 @@
 from django.db import models
-from auth_app.models import UserProfile
+from django.contrib.auth.models import User
+from board_app.models import Board
 
 # class Assignee(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     email = models.EmailField()
-#     fullname = models.CharField(max_length=255)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     board = models.ForeignKey(Board, related_name='assignees', on_delete=models.CASCADE)
 
 #     def __str__(self):
-#         return self.id
+#         return f"{self.user.username} - {self.board.title}"
 
 # class Reviewer(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     email = models.EmailField()
-#     fullname = models.CharField(max_length=255)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     board = models.ForeignKey(Board, related_name='reviewers', on_delete=models.CASCADE)
 
 #     def __str__(self):
-#         return self.id
+#         return f"{self.user.username} - {self.board.title}"
 
 class Task(models.Model):
-    board = models.IntegerField()
+    board = models.ForeignKey(Board, related_name='tasks', on_delete=models.CASCADE)
     title = models.CharField(max_length=255) 
     description = models.CharField(max_length=255)
     status = models.CharField(max_length=255)
     priority = models.CharField(max_length=255)
-    assignee_id = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='assigned_tasks')
-    reviewer_id = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='reviewed_tasks')
+    assignee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_tasks', null=True, blank=True)
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviewed_tasks', null=True, blank=True)
     due_date = models.DateField()
 
     def __str__(self):

@@ -11,9 +11,9 @@ def get_token_response(user):
     token, created = Token.objects.get_or_create(user=user)
     return {
         'token': token.key,
-        'fullname': user.username, # Ehemals fullname
+        'fullname': user.username,
         'email': user.email,
-        'user_id': user.id # Ehemals user.user_id
+        'user_id': user.id
     }
 
 class RegistrationView(generics.CreateAPIView):
