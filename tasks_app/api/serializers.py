@@ -1,28 +1,30 @@
 from rest_framework import serializers
-from tasks_app.models import Task
+from tasks_app.models import Task, Board
 from django.contrib.auth.models import User
 
+class UserShortSerializer(serializers.ModelSerializer):
+    fullname = serializers.CharField(source='username')
+
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'fullname']
+
 class TaskSerializer(serializers.ModelSerializer):
-    # assignee = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
-    # reviewer = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
+    assignee = UserShortSerializer(read_only=True)
+    reviewer = UserShortSerializer(read_only=True)
+    assignee_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='assignee', write_only=True, required=False)
+    reviewer_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='reviewer', write_only=True, required=False)
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = [
+            'id', 'board', 'title', 'description', 'status', 'priority', 
+            'assignee', 'assignee_id', 'reviewer', 'reviewer_id', 
+            'due_date', 'comments_count'
+        ]
 
-    # New lines of code
-
-    def validate(self, attrs):
-        board = attrs.get('board')
-        assignee = attrs.get('assignee')
-        reviewer = attrs.get('reviewer')
-
-        if board is None:
-            raise serializers.ValidationError({"board": "Board is required."})
-        
-        members = board.members.all()
-        if assignee not in members:
-            raise serializers.ValidationError({"assignee": "Assignee must be a member of the board."})
-        if reviewer not in members:
-            raise serializers.ValidationError({"reviewer must be a member of the board."})
-        return attrs
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.pop('assignee_id', None)
+        data.pop('reviewer_id', None)
+        return data
