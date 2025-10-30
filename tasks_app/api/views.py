@@ -31,4 +31,4 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         # ensure user can access this object
         user = self.request.user
-        return Task.objects.filter(board__members=user)
+        return Task.objects.filter(board__members=user).distinct()
