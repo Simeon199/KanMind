@@ -8,8 +8,6 @@ class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
 
-# New lines of code
-
 class TaskListCreateView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
@@ -18,9 +16,6 @@ class TaskListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         return Task.objects.filter(board__members=user).distinct()
-    
-    # def perform_create(self, serializer):
-    #     serializer.save()
 
 class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
