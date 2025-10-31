@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tasks_app.models import Task, Board
+from tasks_app.models import Task, TaskCommentsModel, Board
 from django.contrib.auth.models import User
 
 class UserShortSerializer(serializers.ModelSerializer):
@@ -28,3 +28,20 @@ class TaskSerializer(serializers.ModelSerializer):
         data.pop('assignee_id', None)
         data.pop('reviewer_id', None)
         return data
+    
+class TaskCommentsSerializer(serializers.ModelSerializer):
+    # Old Code
+    # model = TaskCommentsModel
+    # fields = '__all__'
+
+    # New Code
+    author = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = TaskCommentsModel
+        fields = ['id', 'created_at', 'author', 'content']
+        read_only_fields = ['id', 'created_at', 'author']
+
+    def get_author(self, obj):
+        # Return the users full name if available, else username
+        return f"{obj.author.first_name} {obj.author.last_name}".strip() or obj.author.username
