@@ -31,10 +31,10 @@ class Task(models.Model):
         return self.title
     
 class TaskCommentsModel(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_comments') 
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_author', null=True, blank=True) 
     content = models.TextField()
-    created_at = models.DateTimeField(outo_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return f"{self.author.username}: {self.content[:20]}"

@@ -30,11 +30,7 @@ class TaskSerializer(serializers.ModelSerializer):
         return data
     
 class TaskCommentsSerializer(serializers.ModelSerializer):
-    # Old Code
-    # model = TaskCommentsModel
-    # fields = '__all__'
 
-    # New Code
     author = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -43,5 +39,4 @@ class TaskCommentsSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'author']
 
     def get_author(self, obj):
-        # Return the users full name if available, else username
         return f"{obj.author.first_name} {obj.author.last_name}".strip() or obj.author.username
