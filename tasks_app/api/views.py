@@ -1,5 +1,6 @@
 from tasks_app.models import Task, TaskCommentsModel
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import TaskSerializer, TaskCommentsSerializer
 
@@ -35,3 +36,8 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         return Task.objects.filter(board__members=user).distinct()
+    
+class TaskCommentRetrieveDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TaskCommentsModel.objects.all()
+    serializer_class = TaskCommentsSerializer
+    permission_classes = [IsAuthenticated]
