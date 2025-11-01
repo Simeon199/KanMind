@@ -23,8 +23,6 @@ class TaskCommentListView(generics.ListCreateAPIView):
     serializer_class = TaskCommentsSerializer
     permission_classes = [IsAuthenticated]
 
-    # New lines of code
-    
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -37,7 +35,11 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         user = self.request.user
         return Task.objects.filter(board__members=user).distinct()
     
-class TaskCommentRetrieveDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = TaskCommentsModel.objects.all()
+class TaskCommentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     serializer_class = TaskCommentsSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return TaskCommentsModel.objects.filter(
+            pk=self.kwargs['comment_id']
+        )

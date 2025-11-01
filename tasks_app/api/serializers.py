@@ -43,25 +43,3 @@ class TaskCommentsSerializer(serializers.ModelSerializer):
 
     def get_author(self, obj):
         return f"{obj.author.first_name} {obj.author.last_name}".strip() or obj.author.username
-
-    # New Lines of Code
-
-    @action(detail=True, methods=['put'])
-    def delete_comment(self, request, serializer_obj, comment_id):
-        """Delete a specific comment for the task when comment_id is provided"""
-        try:
-            # Fetch the TaskCommentsModel instance with the given comment_id
-            comment = TaskCommentsModel.objects.get(
-                task_id=comment_id,
-                author=serializer_obj.context['user']
-            )
-        except ObjectDoesNotExist:
-            return Response({'error': 'Comment not found or unauthorized.'}, status=404)
-        
-        try:
-            # Delete the comment (overwrites existing delete via Django's ORM)
-            comment.delete()
-            serializer_obj.context['success'] = True
-            return Response(status=204) 
-        except Exception as e:
-            return Response({'error': str(e)}, status=500)
