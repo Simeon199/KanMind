@@ -9,7 +9,8 @@ class BoardSerializer(serializers.ModelSerializer):
 
         class Meta:
             model = Board
-            fields = '__all__'
+            fields = ['id', 'title', 'members', 'member_count', 'owner_id']
+            # fields = '__all__'
             # extra_kwargs = {
             #      'members': {'required': False},
             # }
