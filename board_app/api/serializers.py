@@ -10,16 +10,14 @@ class BoardSerializer(serializers.ModelSerializer):
         class Meta:
             model = Board
             fields = ['id', 'title', 'members', 'member_count', 'owner_id']
-            # fields = '__all__'
-            # extra_kwargs = {
-            #      'members': {'required': False},
-            # }
+            read_only_fields = ['owner_id']
 
         def get_member_count(self, obj):
             return len(obj.members.all())
         
         def create(self, validated_data):
              members = validated_data.pop('members', [])
+             validated_data.pop('owner', None)
              board = Board.objects.create(owner=self.context['request'].user, **validated_data)
              if members:
                   board.members.set(members)
