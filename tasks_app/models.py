@@ -17,7 +17,7 @@ class Task(models.Model):
         ('done', 'Done')
     ]
 
-    board = models.ForeignKey(Board, related_name='tasks', on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, related_name='tasks', on_delete=models.CASCADE, null=True, blank=True) # null = True und blank = True neue Zuweisungen!
     title = models.CharField(max_length=255) 
     description = models.CharField(max_length=255)
     status = models.CharField(max_length=255)
@@ -25,14 +25,14 @@ class Task(models.Model):
     assignee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_tasks', null=True, blank=True)
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviewed_tasks', null=True, blank=True)
     due_date = models.DateField()
-    comments_count = models.IntegerField(default=0)
+    comments_count = models.IntegerField(default=0, null=True, blank=True) # default = 0, null = True und blank = True sind neue Zuweisungen
 
     def __str__(self):
         return self.title
     
 class TaskCommentsModel(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_author', null=True, blank=True) 
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_author') 
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 

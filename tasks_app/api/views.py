@@ -1,6 +1,7 @@
 from tasks_app.models import Task, TaskCommentsModel
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsCommentAuthor
 from .serializers import TaskSerializer, TaskCommentsSerializer
 
 class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
@@ -35,10 +36,19 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         return Task.objects.filter(board__members=user).distinct()
     
 class TaskCommentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
+    queryset = TaskCommentsModel.objects.all()
     serializer_class = TaskCommentsSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCommentAuthor]
+    # lookup_field = 'pk'
+
+    # def get_queryset(self):
+    #     task_id = self.kwargs.get('task_id')
+    #     return TaskCommentsModel.objects.filter(task_id=task_id).distinct()
 
     def get_queryset(self):
+        task_id = self.kwargs.get('task_id')
+        comment_id = self.kwargs.get('comment_id')
         return TaskCommentsModel.objects.filter(
-            pk=self.kwargs['comment_id']
+            task_id=task_id,
+            pk=comment_id
         )
