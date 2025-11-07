@@ -21,6 +21,28 @@ class RegistrationSerializer(serializers.ModelSerializer):
             }
         }
 
+    # def validate(self, data):
+    #     self._validate_passwords(data)
+    #     self._validate_email(data['email'])
+    #     return data
+    
+    # def _validate_passwords(self, data):
+    #     if data['password'] != data['repeated_password']:
+    #         raise serializers.ValidationError({'error': 'Passwords do not match'})
+        
+    # def _validate_email(self, email):
+    #     if User.objects.filter(email=email).exists():
+    #         raise serializers.ValidationError({'email': 'Email already exists'})
+        
+    # def create(self, validated_data):
+    #     user = User(
+    #         email=validated_data['email'],
+    #         username=validated_data['username']
+    #     )
+    #     user.set_password(validated_data['password'])
+    #     user.save()
+    #     return user
+
     def save(self):
         password = self.validated_data['password']
         repeated_password = self.validated_data['repeated_password']
@@ -42,7 +64,22 @@ class CustomAuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(label="email", write_only=True)
     password = serializers.CharField(label="password", style={'input_type': 'password'}, trim_whitespace=False, write_only=True)
     
-    # Find the user by email
+    # def validate(self, attrs):
+    #     user = self._get_user_by_email(attrs.get('email'))
+    #     self._validate_credentials(user, attrs.get('password'))
+    #     attrs['user'] = user
+    #     return attrs
+    
+    # def _get_user_by_email(self,email):
+    #     try:
+    #         return User.objects.get(email=email)
+    #     except User.DoesNotExist:
+    #         raise serializers.ValidationError({'email': 'No user with this email'})
+        
+    # def _validate_credentials(self, user, password):
+    #     if not authenticate(username=user.username, password=password):
+    #         raise serializers.ValidationError({'password': 'Invalid credentials'})
+
     def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')
@@ -51,7 +88,6 @@ class CustomAuthTokenSerializer(serializers.Serializer):
         except User.DoesNotExist:
             raise serializers.ValidationError({'email': 'No user with this email'})
 
-        # Authenticate using username and password
         user = authenticate(username=user.username, password=password)
         if not user:
             raise serializers.ValidationError({'password': 'Invalid credentials'})
