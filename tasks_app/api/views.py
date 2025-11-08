@@ -19,12 +19,20 @@ class TaskListCreateView(generics.ListCreateAPIView):
         return Task.objects.filter(board__members=user).distinct()
     
 class TaskCommentListView(generics.ListCreateAPIView):
-    queryset = TaskCommentsModel.objects.all()
+    # queryset = TaskCommentsModel.objects.all()
     serializer_class = TaskCommentsSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        task_id = self.kwargs.get('pk')
+        return TaskCommentsModel.objects.filter(task_id=task_id)
+
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        task_id = self.kwargs.get('pk')
+        serializer.save(
+            author=self.request.user,
+            task=Task.objects.get(pk=task_id)
+        )
 
 class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
@@ -39,9 +47,15 @@ class TaskCommentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     queryset = TaskCommentsModel.objects.all()
     serializer_class = TaskCommentsSerializer
     permission_classes = [IsAuthenticated, IsCommentAuthor]
+    lookup_field = 'comment_id'
+    
+    # lookup_field = 'pk'
 
+    # def get_queryset(self):
+    #     task_id = self.kwargs.get('pk')
+    #     return TaskCommentsModel.objects.filter(task_id=task_id)
+    
     def get_queryset(self):
-        # task_id = self.kwargs.get('task_id')
         task_id = self.kwargs.get('pk')
         comment_id = self.kwargs.get('comment_id')
         return TaskCommentsModel.objects.filter(
