@@ -19,7 +19,6 @@ class TaskListCreateView(generics.ListCreateAPIView): # generics.ListCreateAPIVi
         return Task.objects.filter(board__members=user).distinct()
     
 class TaskCommentListView(generics.ListCreateAPIView):
-    # queryset = TaskCommentsModel.objects.all()
     serializer_class = TaskCommentsSerializer
     permission_classes = [IsAuthenticated, IsMemberOfBoard]
 

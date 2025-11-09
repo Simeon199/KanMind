@@ -38,13 +38,11 @@ class TaskSerializer(serializers.ModelSerializer):
         assignee = data.get('assignee', getattr(self.instance, 'assignee', None))
         reviewer = data.get('reviewer', getattr(self.instance, 'reviewer', None))
 
-        # Check assignee and reviewer are board members (if provided)
         if assignee and assignee not in board.members.all():
             raise serializers.ValidationError("Assignee must be a member of the board.")
         if reviewer and reviewer not in board.members.all():
             raise serializers.ValidationError("Reviewer must be a member of the board.")
         
-        # Prevent changing the board on update
         if self.instance and 'board' in data and data['board'] != self.instance.board:
             raise serializers.ValidationError("Changing the board of a task is not allowed.")
         
