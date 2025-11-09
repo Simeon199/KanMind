@@ -47,7 +47,7 @@ class TaskCommentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     queryset = TaskCommentsModel.objects.all()
     serializer_class = TaskCommentsSerializer
     permission_classes = [IsAuthenticated, IsCommentAuthor]
-    lookup_field = 'comment_id'
+    # lookup_field = 'comment_id'
     
     # lookup_field = 'pk'
 
@@ -56,8 +56,8 @@ class TaskCommentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     #     return TaskCommentsModel.objects.filter(task_id=task_id)
     
     def get_queryset(self):
-        task_id = self.kwargs.get('pk')
-        comment_id = self.kwargs.get('comment_id')
+        task_id = self.kwargs.get('task_id') # pk
+        comment_id = self.kwargs.get('pk')
         return TaskCommentsModel.objects.filter(
             task_id=task_id,
             pk=comment_id

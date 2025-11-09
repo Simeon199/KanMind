@@ -52,7 +52,7 @@ class TaskCommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskCommentsModel
-        fields = ['id', 'task', 'created_at', 'author', 'content']
+        fields = ['id', 'created_at', 'author', 'content']
         read_only_fields = ['id', 'created_at', 'author']
 
     def get_author(self, obj):
