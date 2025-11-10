@@ -25,31 +25,39 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
     
     def get_comments_count(self, obj):
+        """Return the number of comments related to the task."""
         return obj.comments.count()
 
     def to_representation(self, instance):
+        """Customize the serialized output by removing write-only fields."""
         data = super().to_representation(instance)
-        data.pop('assignee_id', None)
-        data.pop('reviewer_id', None)
+        for field in ['assignee_id', 'reviewer_id']:
+            data.pop(field, None)
+        return data
+
+    def validate(self, data):
+        """Validate that the assignee and reviewer are members of the board."""
+        board = self._get_board(data)
+        self._validate_user_membership(data.get('assignee'), board, "Assignee")
+        self._validate_user_membership(data.get('reviewer'), board, "Reviewer")
+        self._prevent_board_change(data)
         return data
     
-    def validate(self, data):
-        board = data.get('board') or getattr(self.instance, 'board', None)
-        assignee = data.get('assignee', getattr(self.instance, 'assignee', None))
-        reviewer = data.get('reviewer', getattr(self.instance, 'reviewer', None))
-
-        if assignee and assignee not in board.members.all():
-            raise serializers.ValidationError("Assignee must be a member of the board.")
-        if reviewer and reviewer not in board.members.all():
-            raise serializers.ValidationError("Reviewer must be a member of the board.")
+    def _get_board(self, data):
+        """Retrieve the board from the data or the instance"""
+        return data.get('board') or getattr(self.instance, 'board', None)
+    
+    def _validate_user_membership(self, user, board, role):
+        """Ensure the user (assignee/reviewer) is a member of the board."""
+        if user and user not in board.members.all():
+            raise serializers.ValidationError(f"{role} must be a member of the board.")
         
+    def _prevent_board_change(self, data):
+        """Prevent changing the board of an existing task."""
         if self.instance and 'board' in data and data['board'] != self.instance.board:
-            raise serializers.ValidationError("Changing the board of a task is not allowed.")
-        
-        return data
+            raise serializers.ValidationError("Changing the board of a task is not allowed")
     
 class TaskCommentsSerializer(serializers.ModelSerializer):
-
     author = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
