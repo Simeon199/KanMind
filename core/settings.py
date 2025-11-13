@@ -152,16 +152,36 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500"
 ]
 
-# Optionale (zusätzliche) Änderungen 
-
-# CORS_ALLOW_METHODS = [
-#     'GET',
-#     'POST',
-#     'PUT',
-#     'DELETE'
-# ]
-
-# CORS_ALLOW_HEADERS = [
-#     'Content-Type',
-#     'Authorization',
-# ]
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'tasks_app': {  # Use your app name here
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

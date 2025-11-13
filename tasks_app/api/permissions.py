@@ -1,14 +1,29 @@
 from rest_framework import permissions
+from django.db import models
 from tasks_app.models import Task
 from board_app.models import Board
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 class IsAuthenticatedAndAssignee(permissions.BasePermission):
     """
     For GET /api/tasks/assigned-to-me/
-    Ensures the user is authenticated.
+    Ensures the user is authenticated and is an assignee on boards they are a member of.
     """
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated
+        if not(request.user and request.user.is_authenticated):
+            return False
+    
+class IsAuthenticatedAndReviewer(permissions.BasePermission):
+    """
+    For GET /api/tasks/reviewing/
+    Ensures the user is authenticated and is a reviewer on boards they are member of.
+    """
+    def has_permission(self, request, view):
+        if not(request.user and request.user.is_authenticated):
+            return False
     
 class IsAuthenticatedAndReviewer(permissions.BasePermission):
     """
@@ -19,56 +34,35 @@ class IsAuthenticatedAndReviewer(permissions.BasePermission):
         return request.user and request.user.is_authenticated
 
 class IsMemberOfBoard(permissions.BasePermission):
-    """
-    Permission for POST, PATCH, and GET comments.
-    Ensures the user is a member of the board or the board owner.
-    """
     def has_permission(self, request, view):
-        board = self._get_board_from_request(request, view)
+        if request.method in permissions.SAFE_METHODS:
+            logger.debug(f"SAFE_METHODS check: User {request.user} is authenticated: {request.user.is_authenticated}")
+            return bool(request.user and request.user.is_authenticated)
+
+        # Existing logic for non-safe methods
+        board = None
+        data = getattr(request, "data", {}) or {}
+
+        # Try to get the board from the request data or task ID
+        board_id = data.get("board") or data.get("board_id") or data.get("boardId")
+        if board_id:
+            try:
+                board = Board.objects.get(pk=board_id)
+            except Board.DoesNotExist:
+                return False
+
         if not board:
-            return False
-        return self._is_board_member_or_owner(request.user, board)
-    
-    def has_object_permission(self, request, view, obj):
-        board = self._get_board_from_object(obj)
-        if not board:
-            return False
-        return self._is_board_member_or_owner(request.user, board)
-    
-    def _get_board_from_request(self, request, view):
-        """
-        Retrieve the board from the request data or the task in the URL.
-        """
-        board_id = request.data.get('board')
-        if not board_id and hasattr(view, 'kwargs'):
-            task_id = view.kwargs.get('pk') or view.kwargs.get('task_id')
+            task_id = view.kwargs.get("pk") or view.kwargs.get("task_id")
             if task_id:
                 try:
-                    return Task.objects.get(pk=task_id).board
+                    board = Task.objects.get(pk=task_id).board
                 except Task.DoesNotExist:
-                    return None
-            if board_id:
-                try:
-                    return Board.objects.get(pk=board_id)
-                except Board.DoesNotExist:
-                    return None
-            return None
-        
-    def _get_board_from_object(self, obj):
-        """
-        Retrieve the board from the object (task or comment).
-        """
-        if hasattr(obj, 'board'):
-            return obj.board
-        if hasattr(obj, 'task') and hasattr(obj.task, 'board'):
-            return obj.task.board
-        return None
-    
-    def _is_board_member_or_owner(self, user, board):
-        """
-        Check if the user is a member of the board or the board owner.
-        """
-        return board.members.filter(id=user.id).exists() or board.owner == user
+                    return False
+
+        if not board:
+            return False
+
+        return board.members.filter(id=request.user.id).exists() or board.owner_id == request.user.id
     
 class IsTaskCreatorOrBoardOwner(permissions.BasePermission):
     """

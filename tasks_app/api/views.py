@@ -4,15 +4,21 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsCommentAuthor, IsMemberOfBoard, IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer
 from .serializers import TaskSerializer, TaskCommentsSerializer
 
-class TasksAssignedOrReviewedView(generics.ListCreateAPIView): # generics.ListCreateAPIView
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer]
+import logging
 
-class TaskListCreateView(generics.ListCreateAPIView): # generics.ListCreateAPIView
+logger = logging.getLogger(__name__)
+
+class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMemberOfBoard]
+    permission_classes = [IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer, IsMemberOfBoard] 
+
+# Die Klasse TaskListCreateView scheint das Problem mit der Permission zu verursachen!
+
+class TaskListCreateView(generics.ListCreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated, IsMemberOfBoard] # IsMemberOfBoard
 
     def get_queryset(self):
         user = self.request.user
@@ -20,7 +26,7 @@ class TaskListCreateView(generics.ListCreateAPIView): # generics.ListCreateAPIVi
     
 class TaskCommentListView(generics.ListCreateAPIView):
     serializer_class = TaskCommentsSerializer
-    permission_classes = [IsAuthenticated, IsMemberOfBoard]
+    permission_classes = [IsAuthenticated, IsMemberOfBoard] 
 
     def get_queryset(self):
         task_id = self.kwargs.get('pk')
@@ -48,7 +54,7 @@ class TaskCommentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsAuthenticated, IsCommentAuthor]
     
     def get_queryset(self):
-        task_id = self.kwargs.get('task_id') # pk
+        task_id = self.kwargs.get('task_id')
         comment_id = self.kwargs.get('pk')
         return TaskCommentsModel.objects.filter(
             task_id=task_id,

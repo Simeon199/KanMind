@@ -10,10 +10,15 @@ class UserShortSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'fullname']
 
 class TaskSerializer(serializers.ModelSerializer):
+    # Output 
     assignee = UserShortSerializer(read_only=True)
     reviewer = UserShortSerializer(read_only=True)
+
+    # Accept IDs (preferred keys)
     assignee_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='assignee', write_only=True, required=False)
     reviewer_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='reviewer', write_only=True, required=False)
+    
+    
     comments_count = serializers.SerializerMethodField()
 
     class Meta:
