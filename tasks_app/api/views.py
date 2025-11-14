@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsCommentAuthor, IsMemberOfBoard, IsAuthenticatedAndRelatedToTask, IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer
 from .serializers import TaskSerializer, TaskCommentsSerializer
+from django.db import models
 
 import logging
 
@@ -11,14 +12,38 @@ logger = logging.getLogger(__name__)
 class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMemberOfBoard] # IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer, IsMemberOfBoard
-       
-# Die Klasse TaskListCreateView scheint das Problem mit der Permission zu verursachen!
+    permission_classes = [IsAuthenticated] # Ehemals IsMemberOfBoard
 
+    def get_queryset(self):
+        user = self.request.user
+        if 'assigned-to-me' in self.request.path:
+            # Include tasks where user is assignee, on boards they are members of (owner logic: if board.owner == user and assignee == user, included)
+            return Task.objects.filter(
+                models.Q(board__members=user) | models.Q(board__owner=user),  # Ensure user is member or owner
+                assignee=user,
+            ).distinct()
+        elif 'reviewing' in self.request.path:
+            # Include tasks where user is reviewer, on boards they are members of
+            return Task.objects.filter(
+                models.Q(board__members=user) | models.Q(board__owner=user),
+                reviewer=user,
+            ).distinct()
+        else:
+            return Task.objects.none()  # Fallback, shouldn't happen
+        
+    # Optional: If allowing creation, adjust perform_create to set assignee/reviewer based on endpoint
+    def perform_create(self, serializer):
+        if 'assigned-to-me' in self.request.path:
+            serializer.save(assignee=self.request.user)
+        elif 'reviewing' in self.request.path:
+            serializer.save(reviewer=self.request.user)
+        else:
+            serializer.save()
+       
 class TaskListCreateView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMemberOfBoard] # IsMemberOfBoard
+    permission_classes = [IsAuthenticated, IsMemberOfBoard] 
 
     def get_queryset(self):
         user = self.request.user

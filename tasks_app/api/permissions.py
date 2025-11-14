@@ -26,40 +26,6 @@ class IsAuthenticatedAndRelatedToTask(permissions.BasePermission):
         filter_kwargs = {f"{self.role}": request.user, "board__in": user_boards}
         return Task.objects.filter(**filter_kwargs).exists()
     
-# Subclasses for specific roles
-
-class IsAuthenticatedAndAssignee(IsAuthenticatedAndRelatedToTask):
-    role = "assignee"
-
-class IsAuthenticatedAndReviewer(IsAuthenticatedAndRelatedToTask):
-    role = "reviewer"
-
-class IsAuthenticatedAndAssignee(permissions.BasePermission):
-    """
-    For GET /api/tasks/assigned-to-me/
-    Ensures the user is authenticated and is an assignee on boards they are a member of.
-    """
-    def has_permission(self, request, view):
-        if not(request.user and request.user.is_authenticated):
-            return False
-    
-class IsAuthenticatedAndReviewer(permissions.BasePermission):
-    """
-    For GET /api/tasks/reviewing/
-    Ensures the user is authenticated and is a reviewer on boards they are member of.
-    """
-    def has_permission(self, request, view):
-        if not(request.user and request.user.is_authenticated):
-            return False
-    
-class IsAuthenticatedAndReviewer(permissions.BasePermission):
-    """
-    Permission for GET /api/tasks/reviewing/.
-    Ensures the user is authenticated.
-    """
-    def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated
-
 class IsMemberOfBoard(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -90,6 +56,14 @@ class IsMemberOfBoard(permissions.BasePermission):
             return False
 
         return board.members.filter(id=request.user.id).exists() or board.owner_id == request.user.id
+        
+# Subclasses for specific roles
+
+class IsAuthenticatedAndAssignee(IsAuthenticatedAndRelatedToTask):
+    role = "assignee"
+
+class IsAuthenticatedAndReviewer(IsAuthenticatedAndRelatedToTask):
+    role = "reviewer"
     
 class IsTaskCreatorOrBoardOwner(permissions.BasePermission):
     """
