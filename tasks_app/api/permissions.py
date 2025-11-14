@@ -7,6 +7,33 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+class IsAuthenticatedAndRelatedToTask(permissions.BasePermission):
+    """
+    Ensures the user is authenticated and is either an assignee or a reviewer on tasks for boards they are member of.
+    """
+
+    role = None
+
+    def has_permission(self, request, view):
+        if not (request.user and request.user.is_authenticated):
+            return False
+        
+        if not self.role:
+            raise ValueError("Role must be defined in the subclass.")
+        
+        # Check if the user is related to tasks (as assignee or reviewer) on boards they are member of
+        user_boards = Board.objects.filter(members=request.user)
+        filter_kwargs = {f"{self.role}": request.user, "board__in": user_boards}
+        return Task.objects.filter(**filter_kwargs).exists()
+    
+# Subclasses for specific roles
+
+class IsAuthenticatedAndAssignee(IsAuthenticatedAndRelatedToTask):
+    role = "assignee"
+
+class IsAuthenticatedAndReviewer(IsAuthenticatedAndRelatedToTask):
+    role = "reviewer"
+
 class IsAuthenticatedAndAssignee(permissions.BasePermission):
     """
     For GET /api/tasks/assigned-to-me/

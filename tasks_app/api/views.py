@@ -1,7 +1,7 @@
 from tasks_app.models import Task, TaskCommentsModel
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsCommentAuthor, IsMemberOfBoard, IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer
+from .permissions import IsCommentAuthor, IsMemberOfBoard, IsAuthenticatedAndRelatedToTask, IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer
 from .serializers import TaskSerializer, TaskCommentsSerializer
 
 import logging
@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer, IsMemberOfBoard] 
-
+    permission_classes = [IsAuthenticated, IsMemberOfBoard] # IsAuthenticatedAndAssignee, IsAuthenticatedAndReviewer, IsMemberOfBoard
+       
 # Die Klasse TaskListCreateView scheint das Problem mit der Permission zu verursachen!
 
 class TaskListCreateView(generics.ListCreateAPIView):
