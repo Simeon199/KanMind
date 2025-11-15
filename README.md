@@ -1,9 +1,9 @@
 # KanMind Backend
 
-This is a backend implemented with Django and Django REST Framework, which was created for task management with Kanban boards and fully supports CRUD operations. It represents virtually the Python backend of the Join app.
+This is a backend built using Django and Django REST Framework, designed specifically for task management on Kanban boards. It fully supports CRUD operations and serves as the Python equivalent of the Join app's backend. 
 ## Getting Started
 
-1. Clone the repository:
+1. Clone the repository from GitHub and navigate to the project directory:
 
 ```bash
   git clone https://github.com/Simeon199/KanMind.git
@@ -15,20 +15,20 @@ This is a backend implemented with Django and Django REST Framework, which was c
 
 python -m venv env
 
-# Setup for Windows:
+# For Windows, activate with:
 env\Scripts\activate
 
-# Setup for Linux/mcOS:
+# For Linux/mcOS, activate with:
 source env/bin/activate
 ```
 
-3. Install dependencies:
+3. Install necessary dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 ## Prerequisites
-To run the application on your local machine, you need the following prerequisites:
+To get started with running the application locally, ensure you have the following prerequisites:
 
 - Python 3.12 or higher
 - Django 5.1 or higher
@@ -38,5 +38,5 @@ To run the application on your local machine, you need the following prerequisit
 
 ## Contributing
 
-Contributions are always welcome. Please create an issue to address the points you would like to change, or fork the repository and submit a pull request.
+Contributions are always welcome. If you have suggestions for improvements or want to propose changes, please open an issue. Alternatively, consider forking the repository and submitting a pull request.
 
