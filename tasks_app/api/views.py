@@ -17,13 +17,11 @@ class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         if 'assigned-to-me' in self.request.path:
-            # Include tasks where user is assignee, on boards they are members of (owner logic: if board.owner == user and assignee == user, included)
             return Task.objects.filter(
                 models.Q(board__members=user) | models.Q(board__owner=user),  # Ensure user is member or owner
                 assignee=user,
             ).distinct()
         elif 'reviewing' in self.request.path:
-            # Include tasks where user is reviewer, on boards they are members of
             return Task.objects.filter(
                 models.Q(board__members=user) | models.Q(board__owner=user),
                 reviewer=user,

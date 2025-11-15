@@ -13,25 +13,37 @@ class TaskSerializer(serializers.ModelSerializer):
     # Output 
     assignee = UserShortSerializer(read_only=True)
     reviewer = UserShortSerializer(read_only=True)
+    # board_members = serializers.SerializerMethodField() 
 
     # Accept IDs (preferred keys)
     assignee_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='assignee', write_only=True, required=False)
     reviewer_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='reviewer', write_only=True, required=False)
     
-    
     comments_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
-        fields = [
+        fields = [ # 'board_members'
             'id', 'board', 'title', 'description', 'status', 'priority', 
-            'assignee', 'assignee_id', 'reviewer', 'reviewer_id', 
+            'assignee', 'assignee_id', 'reviewer', 'reviewer_id', 'board_members',
             'due_date', 'comments_count'
         ]
     
     def get_comments_count(self, obj):
         """Return the number of comments related to the task."""
         return obj.comments.count()
+    
+    # New get_board_members method
+
+    def get_board_members(self, obj):
+        """
+        Return the list of board members (including owner) who can be assigned"
+        """
+        board = obj.board
+        members = list(board.members.all()) 
+        if board.owner not in members: 
+            members.append(board.owner)
+        return UserShortSerializer(members, many=True).data 
 
     def to_representation(self, instance):
         """Customize the serialized output by removing write-only fields."""

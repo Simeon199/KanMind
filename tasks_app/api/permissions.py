@@ -78,7 +78,7 @@ class IsMemberOfBoard(permissions.BasePermission):
             return False
         return self._is_board_member_or_owner(request.user, board)
     
-    def _get_board_from_frequest(self, request, view):
+    def _get_board_from_request(self, request, view):
         """
         Retrieve the board from the request data or URL parameters.
 
