@@ -33,7 +33,7 @@ To get started with running the application locally, ensure you have the followi
 - Python 3.12 or higher
 - Django 5.1 or higher
 - Django REST Framework
-- Postman (optional but very useful to test the API endpoints)
+- Optional but highly recommended: Postman for testing API endpoints
 
 
 ## Contributing
