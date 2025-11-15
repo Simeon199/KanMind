@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated] # Ehemals IsMemberOfBoard
+    permission_classes = [IsAuthenticated] 
 
     def get_queryset(self):
         user = self.request.user
         if 'assigned-to-me' in self.request.path:
             return Task.objects.filter(
-                models.Q(board__members=user) | models.Q(board__owner=user),  # Ensure user is member or owner
+                models.Q(board__members=user) | models.Q(board__owner=user), 
                 assignee=user,
             ).distinct()
         elif 'reviewing' in self.request.path:
@@ -27,9 +27,8 @@ class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
                 reviewer=user,
             ).distinct()
         else:
-            return Task.objects.none()  # Fallback, shouldn't happen
+            return Task.objects.none()
         
-    # Optional: If allowing creation, adjust perform_create to set assignee/reviewer based on endpoint
     def perform_create(self, serializer):
         if 'assigned-to-me' in self.request.path:
             serializer.save(assignee=self.request.user)
