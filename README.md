@@ -38,5 +38,5 @@ To get started with running the application locally, ensure you have the followi
 
 ## Contributing
 
-Contributions are always welcome. If you have suggestions for improvements or want to propose changes, please open an issue. Alternatively, consider forking the repository and submitting a pull request.
+Contributions are always welcome! If you have suggestions for improvements or want to propose changes, please open an issue. Alternatively, consider forking the repository and submitting a pull request.
 
