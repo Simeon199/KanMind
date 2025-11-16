@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from board_app.models import Board, SingleBoard
-from tasks_app.models import Task
+# from tasks_app.models import Task
+from tasks_app.api.serializers import TaskSerializer, UserShortSerializer
 from django.contrib.auth.models import User
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -108,12 +109,15 @@ class BoardSerializer(serializers.ModelSerializer):
 class SingleBoardSerializer(serializers.ModelSerializer):
     """
     Serializer for the SingleBoard model.
-    Handles serialization and deserialization of single board data,
-    including members as primary key references.
+    Handles detailed serialization for retrieving a single board, including full member and task details.
     """
-    members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
+    owner_id = serializers.IntegerField(source='owner.id', read_only=True)
+    members = UserShortSerializer(many=True, read_only=True)
+    tasks = TaskSerializer(many=True, read_only=True) 
+   #  members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
 
     
     class Meta:
          model = SingleBoard
-         fields = '__all__'
+         fields = ['id', 'title', 'owner_id', 'members', 'tasks']
+         # fields = '__all__'
