@@ -1,22 +1,27 @@
 from rest_framework import serializers
 from board_app.models import Board, SingleBoard
+from tasks_app.models import Task
 from django.contrib.auth.models import User
 
 class BoardSerializer(serializers.ModelSerializer):
         """
         Serializer for the Board model.
         Handles serialization and deserialization of board data, including members,
-        owner information, and member count. Supports creating and updating boards
+        owner information, computed fields for task counts and member count. Supports creating and updating boards
         with proper ownership and membership management.
         """
-        members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True, required=False)
+        members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True, required=False, write_only=True)
         owner_id = serializers.IntegerField(source='owner.id', read_only=True)
         member_count = serializers.SerializerMethodField()
+        ticket_count = serializers.SerializerMethodField() # Total tasks on the board
+        tasks_to_do_count = serializers.SerializerMethodField() # Tasks with status "to-do"
+        tasks_high_prio_count = serializers.SerializerMethodField() # Tasks with priority "high"
 
         class Meta:
             model = Board
-            fields = ['id', 'title', 'members', 'member_count', 'owner_id']
-            read_only_fields = ['owner_id']
+            fields = ['id', 'title', 'members', 'member_count', 'ticket_count', 'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id']
+            read_only_fields = ['owner_id', 'member_count', 'ticket_count', 'tasks_to_do_count', 'tasks_high_prio_count']
+            # write_only_fields = ['members']
 
         def get_member_count(self, obj):
             """
@@ -28,6 +33,42 @@ class BoardSerializer(serializers.ModelSerializer):
                int: The count of members.
             """
             return len(obj.members.all())
+        
+        def get_ticket_count(self, obj):
+             """
+             Return the total number of tasks associated with the board.
+
+             Args: 
+                obj: The Board instance.
+
+             Returns:
+                int: The total count of tasks.
+             """
+             return obj.tasks.count() # Assumes reverse relation from Task to Board
+        
+        def get_tasks_to_do_count(self, obj):
+             """
+             Return the number of tasks with status "to-do".
+             
+             Args:
+               obj: The Board instance.
+
+             Returns:
+               int: The count of "to-do" tasks.
+             """
+             return obj.tasks.filter(status='to-do').count()
+        
+        def get_tasks_high_prio_count(self, obj):
+             """
+             Return the number of tasks with priority "high".
+
+             Args:
+                obj: The Board instance.
+
+             Returns:
+                int: The count of high-priority tasks.
+             """
+             return obj.tasks.filter(priority='high').count()
         
         def create(self, validated_data):
              """
