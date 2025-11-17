@@ -1,8 +1,8 @@
-from board_app.models import Board, SingleBoard
+from board_app.models import Board
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import BoardSerializer, SingleBoardSerializer
+from .serializers import BoardSerializer, SingleBoardSerializer, BoardUpdateSerializer
 from .permissions import OwnerOfBoardPermission
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
@@ -41,12 +41,15 @@ class BoardRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     Requires the user to be authenticated and have appropriate permissions
     (e.g., owner or member based on the operation).
     """    
-    queryset = SingleBoard.objects.all()
-    serializer_class = SingleBoardSerializer
+    queryset = Board.objects.all()
     permission_classes = [IsAuthenticated, OwnerOfBoardPermission]
-    # queryset = Board.objects.all()
-    # serializer_class = BoardSerializer
-    # permission_classes = [IsAuthenticated, OwnerOfBoardPermission]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return SingleBoardSerializer # Includes tasks
+        elif self.request.method == 'PATCH':
+            return BoardUpdateSerializer
+        return SingleBoardSerializer # Exludes tasks uses owner_data/members_data
 
 class EmailCheckView(APIView):
     """

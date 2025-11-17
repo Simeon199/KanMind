@@ -60,8 +60,8 @@ class TaskCommentsModel(models.Model):
         content (TextField): The content of the comment.
         created_at (DateTimeField): The timestamp when the comment was created.
     """
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_author')
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments', blank=True, null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_author', blank=True, null=True)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 

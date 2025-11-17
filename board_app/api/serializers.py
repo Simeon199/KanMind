@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from board_app.models import Board, SingleBoard
-# from tasks_app.models import Task
+from board_app.models import Board
 from tasks_app.api.serializers import TaskSerializer, UserShortSerializer
 from django.contrib.auth.models import User
 
@@ -14,26 +13,25 @@ class BoardSerializer(serializers.ModelSerializer):
         members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True, required=False, write_only=True)
         owner_id = serializers.IntegerField(source='owner.id', read_only=True)
         member_count = serializers.SerializerMethodField()
-        ticket_count = serializers.SerializerMethodField() # Total tasks on the board
-        tasks_to_do_count = serializers.SerializerMethodField() # Tasks with status "to-do"
-        tasks_high_prio_count = serializers.SerializerMethodField() # Tasks with priority "high"
+        ticket_count = serializers.SerializerMethodField() 
+        tasks_to_do_count = serializers.SerializerMethodField()
+        tasks_high_prio_count = serializers.SerializerMethodField()
 
         class Meta:
             model = Board
             fields = ['id', 'title', 'members', 'member_count', 'ticket_count', 'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id']
             read_only_fields = ['owner_id', 'member_count', 'ticket_count', 'tasks_to_do_count', 'tasks_high_prio_count']
-            # write_only_fields = ['members']
 
-        def get_member_count(self, obj):
-            """
-            Return the number of members in the board.
+      #   def get_member_count(self, obj):
+      #       """
+      #       Return the number of members in the board.
 
-            Args:
-               obj: The board instance.
-            Returns:
-               int: The count of members.
-            """
-            return len(obj.members.all())
+      #       Args:
+      #          obj: The board instance.
+      #       Returns:
+      #          int: The count of members.
+      #       """
+      #       return len(obj.members.all())
         
         def get_ticket_count(self, obj):
              """
@@ -45,7 +43,7 @@ class BoardSerializer(serializers.ModelSerializer):
              Returns:
                 int: The total count of tasks.
              """
-             return obj.tasks.count() # Assumes reverse relation from Task to Board
+             return obj.tasks.count()
         
         def get_tasks_to_do_count(self, obj):
              """
@@ -114,10 +112,19 @@ class SingleBoardSerializer(serializers.ModelSerializer):
     owner_id = serializers.IntegerField(source='owner.id', read_only=True)
     members = UserShortSerializer(many=True, read_only=True)
     tasks = TaskSerializer(many=True, read_only=True) 
-   #  members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
-
     
     class Meta:
-         model = SingleBoard
+         model = Board
          fields = ['id', 'title', 'owner_id', 'members', 'tasks']
-         # fields = '__all__'
+
+class BoardUpdateSerializer(serializers.ModelSerializer):
+     """
+     Serializer for updating a board (PATCH).
+     Excludes tasks and includes owner_data and members_data with full user details.
+     """
+     owner_data = UserShortSerializer(source='owner', read_only=True) # Full owner details as an object
+     members_data = UserShortSerializer(source='members', many=True, read_only=True) # Full members as an array
+
+     class Meta:
+          model = Board
+          fields = ['id', 'title', 'owner_data', 'members_data'] # Matches PATCH format

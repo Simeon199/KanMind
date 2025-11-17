@@ -19,12 +19,3 @@ class Board(models.Model):
            str: The title of the board.
         """
         return f"{self.title}"
-
-class SingleBoard(models.Model):
-    """
-    Model representing a single board in the application.
-    Includes owner, members, and associated tasks for detailed retrieval.
-    """
-    title = models.CharField(max_length=255)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='single_owner_boards', blank=True, null=True)
-    members = models.ManyToManyField(User, related_name='single_boards')

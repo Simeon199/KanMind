@@ -22,7 +22,7 @@ class TaskSerializer(serializers.ModelSerializer):
     # Output 
     assignee = UserShortSerializer(read_only=True)
     reviewer = UserShortSerializer(read_only=True)
-    board_members = serializers.SerializerMethodField() 
+   #  board_members = serializers.SerializerMethodField() 
 
     # Accept IDs (preferred keys)
     assignee_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='assignee', write_only=True, required=False)
@@ -32,9 +32,9 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = [
-            'id', 'board', 'title', 'description', 'status', 'priority', 
-            'assignee', 'assignee_id', 'reviewer', 'reviewer_id', 'board_members',
+        fields = [ # 'board', 'board_members'
+            'id', 'title', 'description', 'status', 'priority', 
+            'assignee', 'assignee_id', 'reviewer', 'reviewer_id',
             'due_date', 'comments_count'
         ]
     
@@ -52,21 +52,21 @@ class TaskSerializer(serializers.ModelSerializer):
     
     # New get_board_members method
 
-    def get_board_members(self, obj):
-        """
-        Return the list of board members (including owner) who can be assigned.
+   #  def get_board_members(self, obj):
+   #      """
+   #      Return the list of board members (including owner) who can be assigned.
 
-        Args:
-           obj: The Task instance.
+   #      Args:
+   #         obj: The Task instance.
 
-        Returns:
-           list: Serialized list of board members.
-        """
-        board = obj.board
-        members = list(board.members.all()) 
-        if board.owner not in members: 
-            members.append(board.owner)
-        return UserShortSerializer(members, many=True).data 
+   #      Returns:
+   #         list: Serialized list of board members.
+   #      """
+   #      board = obj.board
+   #      members = list(board.members.all()) 
+   #      if board.owner not in members: 
+   #          members.append(board.owner)
+   #      return UserShortSerializer(members, many=True).data 
 
     def to_representation(self, instance):
         """
