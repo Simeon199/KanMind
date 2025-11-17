@@ -45,6 +45,17 @@ class BoardRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, OwnerOfBoardPermission]
 
     def get_serializer_class(self):
+        """
+        Return the appropriate serializer class based on the HTTP request method.
+
+        For GET requests, returns SingleBoardSerializer to include full board details,
+        including tasks. For PATCH requests, returns BoardUpdateSerializer to provide
+        updated board data with owner and member details, excluding tasks. Defaults
+        to SingleBoardSerializer for other methods.
+
+        Returns:
+            Serializer class: The serializer to user for the request.
+        """
         if self.request.method == 'GET':
             return SingleBoardSerializer # Includes tasks
         elif self.request.method == 'PATCH':

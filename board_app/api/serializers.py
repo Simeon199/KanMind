@@ -22,16 +22,16 @@ class BoardSerializer(serializers.ModelSerializer):
             fields = ['id', 'title', 'members', 'member_count', 'ticket_count', 'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id']
             read_only_fields = ['owner_id', 'member_count', 'ticket_count', 'tasks_to_do_count', 'tasks_high_prio_count']
 
-      #   def get_member_count(self, obj):
-      #       """
-      #       Return the number of members in the board.
+        def get_member_count(self, obj):
+            """
+            Return the number of members in the board.
 
-      #       Args:
-      #          obj: The board instance.
-      #       Returns:
-      #          int: The count of members.
-      #       """
-      #       return len(obj.members.all())
+            Args:
+               obj: The board instance.
+            Returns:
+               int: The count of members.
+            """
+            return len(obj.members.all())
         
         def get_ticket_count(self, obj):
              """
