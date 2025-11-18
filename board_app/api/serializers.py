@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from board_app.models import Board
-from tasks_app.api.serializers import TaskSerializer, UserShortSerializer
+from tasks_app.api.serializers import TaskSerializerWithoutBoard, UserShortSerializer
 from django.contrib.auth.models import User
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -111,7 +111,7 @@ class SingleBoardSerializer(serializers.ModelSerializer):
     """
     owner_id = serializers.IntegerField(source='owner.id', read_only=True)
     members = UserShortSerializer(many=True, read_only=True)
-    tasks = TaskSerializer(many=True, read_only=True) 
+    tasks = TaskSerializerWithoutBoard(many=True, read_only=True) 
     
     class Meta:
          model = Board
@@ -122,9 +122,9 @@ class BoardUpdateSerializer(serializers.ModelSerializer):
      Serializer for updating a board (PATCH).
      Excludes tasks and includes owner_data and members_data with full user details.
      """
-     owner_data = UserShortSerializer(source='owner', read_only=True) # Full owner details as an object
-     members_data = UserShortSerializer(source='members', many=True, read_only=True) # Full members as an array
+     owner_data = UserShortSerializer(source='owner', read_only=True) 
+     members_data = UserShortSerializer(source='members', many=True, read_only=True) 
 
      class Meta:
           model = Board
-          fields = ['id', 'title', 'owner_data', 'members_data'] # Matches PATCH format
+          fields = ['id', 'title', 'owner_data', 'members_data'] 
