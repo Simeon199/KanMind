@@ -57,10 +57,10 @@ class BoardRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             Serializer class: The serializer to user for the request.
         """
         if self.request.method == 'GET':
-            return SingleBoardSerializer # Includes tasks
+            return SingleBoardSerializer 
         elif self.request.method == 'PATCH':
             return BoardUpdateSerializer
-        return SingleBoardSerializer # Exludes tasks uses owner_data/members_data
+        return SingleBoardSerializer
 
 class EmailCheckView(APIView):
     """

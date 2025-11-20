@@ -9,33 +9,12 @@ This is a backend built using Django and Django REST Framework, designed specifi
 - [API Testing with Postman](#api-testing-with-postman)
 - [Contributing](#contributing)
 
-## Getting Started
+## Features
 
-1. Clone the repository from GitHub and navigate to the project directory:
-
-```bash
-  git clone https://github.com/Simeon199/KanMind.git
-  cd KanMind
-```
-
-2. Create and activate a virtual environment:
-
-```bash
-
-python -m venv env
-
-# For Windows, activate with:
-env\Scripts\activate
-
-# For Linux/mcOS, activate with:
-source env/bin/activate
-```
-
-3. Install necessary dependencies:
-
-```bash
-pip install -r requirements.txt
-```
+- User authentication and board permissions
+- CRUD for tasks and boards
+- Kanban board management
+- RESTful API with DRF
 
 ## Prerequisites
 
@@ -45,6 +24,17 @@ To get started with running the application locally, ensure you have the followi
 - [Postman](https://www.postman.com/downloads/) (optional, for easy API testing)
 
 _All Python dependencies are specified in `requirements.txt` and installed automatically._
+
+## Installation
+
+1. Clone: `git clone clone https://github.com/Simeon199/KanMind.git && cd KanMind`
+2. Virtualenv: `python -m venv env && env\Scripts\activate` (Windows)
+3. Install: `pip install -r requirements.txt`
+4. Migrate: `python manage.py makemigrations && python manage.py migrate`
+
+## Running the Server
+
+`python manage.py runserver`
 
 ## API Testing with Postman
 

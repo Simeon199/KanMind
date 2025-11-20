@@ -138,22 +138,58 @@ class IsMemberOfBoard(permissions.BasePermission):
 # Subclasses for specific roles
 
 class IsAuthenticatedAndAssignee(IsAuthenticatedAndRelatedToTask):
+    """
+    Permission class to ensure the user is authenticated and is an assignee on tasks
+    for boards they are member of. Inherits from IsAuthenticatedAndRelatedToTask
+    and sets the role to 'assignee'.
+    """
     role = "assignee"
 
 class IsAuthenticatedAndReviewer(IsAuthenticatedAndRelatedToTask):
+    """
+    Permission class to ensure the user is authenticated and is a reviewer on tasks
+    for boards they are member of. Inherits from IsAuthenticatedAndRelatedToTask and
+    sets the role to 'reviewer'.
+    """
     role = "reviewer"
     
 class IsTaskCreatorOrBoardOwner(permissions.BasePermission):
     """
-    For DELETE /api/tasks/{task_id}
+    Permission class for DELETE /api/tasks/{task_id}.
+    Ensures the user is the task creator or the board owner.
     """
+
     def has_object_permission(self, request, view, obj):
+        """
+        Check if the user is the task creator or the board owner.
+
+        Args:
+           request: The HTTP request object.
+           view: The view being accessed.
+           obj: The task object being accessed.
+
+        Returns:
+           bool: True if the user is the creator or owner, False otherwise.
+        """
         user = request.user
         return obj.author == user or obj.board.owner == user
     
 class IsCommentAuthor(permissions.BasePermission):
     """
-    For DELETE /api/tasks/{task_id}/comments/{comment_id}/
+    Permission class for DELETE /api/tasks/{task_id}/comments/{comment_id}/.
+    Ensures the user is the author of the comment.
     """
+
     def has_object_permission(self, request, view, obj):
+        """
+        Check if the user is the author of the comment.
+
+        Args:
+           request: The HTTP request object.
+           view: The view being accessed.
+           obj: The TaskCommentsModel object being accessed.
+
+        Returns:
+           bool: True if the user is the author, False otherwise.
+        """
         return obj.author == request.user

@@ -17,8 +17,7 @@ class Task(models.Model):
         due_date (DateField): The due date for the task.
         comments_count (IntegerField): The number of comments on the task.
     """
-
-
+    
     PRIORITY_CHOICES = [
         ('low', 'Low'),
         ('medium', 'Medium'),
