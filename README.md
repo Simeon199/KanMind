@@ -4,8 +4,10 @@ This is a backend built using Django and Django REST Framework, designed specifi
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
+- [Features](#features)
 - [Prerequisites](#prerequisites)
+- [Installtion](#installation)
+- [Running the Server](#running-the-server)
 - [API Testing with Postman](#api-testing-with-postman)
 - [Contributing](#contributing)
 
