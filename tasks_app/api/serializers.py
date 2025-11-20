@@ -31,7 +31,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = [ # 'board_members'
+        fields = [
             'id', 'board', 'title', 'description', 'status', 'priority', 
             'assignee', 'assignee_id', 'reviewer', 'reviewer_id',
             'due_date', 'comments_count'
