@@ -8,6 +8,7 @@ This is a backend built using Django and Django REST Framework, designed specifi
 - [Prerequisites](#prerequisites)
 - [Installtion](#installation)
 - [Running the Server](#running-the-server)
+- [Creating a Superuser](#creating-a-superuser)
 - [API Testing with Postman](#api-testing-with-postman)
 - [Contributing](#contributing)
 
