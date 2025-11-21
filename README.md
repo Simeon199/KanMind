@@ -42,6 +42,8 @@ To start the development server:
 1. Run: `python manage.py runserver`
 2. Access the API at `http://127.0.0.1:8000/` in your browser or API client.
 
+This launches Djangos's built-in development server, allowing you to test the API endpoints locally. Note that this is for development only.
+
 ## Creating a Superuser
 
 To access admin features or perform administrative tasks, create a superuser account:
