@@ -37,7 +37,10 @@ _All Python dependencies are specified in `requirements.txt` and installed autom
 
 ## Running the Server
 
-`python manage.py runserver`
+To start the development server:
+
+1. Run: `python manage.py runserver`
+2. Access the API at `http://127.0.0.1:8000/` in your browser or API client.
 
 ## Creating a Superuser
 
