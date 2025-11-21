@@ -6,14 +6,16 @@ def backfill_board_owners(apps, schema_editor):
     Board = apps.get_model('board_app', 'Board')
     User = apps.get_model('auth', 'User')
 
-    try:
-        owner = User.objects.get(username='Claude Mitchell')
-    except User.DoesNotExist:
-        raise ValueError("Target owner user not found. Adjust the lookup in the migration.")
+    # Check if any users exist (skip if database is empty, e.g., for new clones)
+    if not User.objects.exists():
+        return # No users, no backfill needed
     
-    # owner = User.objects.filter(is_superuser=True).first() or User.objects.order_by('id').first()
-    # if not owner:
-    #     return
+    # Find a suitable owner: prefer superuser, then first user by ID
+    owner = User.objects.filter(is_superuser=True).first()
+    if not owner:
+        owner = User.objects.order_by('id').first()
+    if not owner:
+        return # Fallback: no suitable owner found, skip
     
     # Find boards with NULL owner
     qs = Board.objects.filter(owner__isnull=True)
