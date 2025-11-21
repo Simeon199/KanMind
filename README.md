@@ -38,6 +38,16 @@ _All Python dependencies are specified in `requirements.txt` and installed autom
 
 `python manage.py runserver`
 
+## Creating a Superuser
+
+To access admin features or perform administrative tasks, create a superuser account:
+
+1. Run `python manage.py createsuperuser`
+2. Follow the prompts to enter a username, email, and password.
+3. Use the superuser credentials to log in via the Django admin panel at `http://127.0.0.1:8000/admin/` or for API authentication.
+
+This is useful for testing permissions, managing users, and accessing protected endpoints.
+
 ## API Testing with Postman
 
 A [Postman Collection](postman/KanMind.postman_collection.json) is included to help you test the API endpoints.
