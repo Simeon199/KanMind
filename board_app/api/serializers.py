@@ -72,17 +72,20 @@ class BoardSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
              """
              Create a new board instance with the authenticated user as owner.
+             Automatically adds the owner to the board's members if not already included.
 
              Args:
                 validated_data: The validated data from the request.
+
              Returns:
                 Board: The created board instance.
              """
              members = validated_data.pop('members', [])
              validated_data.pop('owner', None)
              board = Board.objects.create(owner=self.context['request'].user, **validated_data)
-             if members:
-                  board.members.set(members)
+             board.members.set(members)
+             if board.owner not in board.members.all():
+                  board.members.add(board.owner)
              return board
         
         def update(self, instance, validated_data):
