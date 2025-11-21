@@ -30,7 +30,7 @@ _All Python dependencies are specified in `requirements.txt` and installed autom
 
 ## Installation
 
-1. Clone: `git clone clone https://github.com/Simeon199/KanMind.git && cd KanMind`
+1. Clone: `git clone https://github.com/Simeon199/KanMind.git && cd KanMind`
 2. Virtualenv: `python -m venv env && env\Scripts\activate` (Windows)
 3. Install: `pip install -r requirements.txt`
 4. Migrate: `python manage.py makemigrations && python manage.py migrate`
