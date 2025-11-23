@@ -56,11 +56,11 @@ This is useful for testing permissions, managing users, and accessing protected 
 
 ## API Testing with Postman
 
-A [Postman Collection](postman/kanmind.postman_collection.json) is included to help you test the API endpoints.
+A [Postman Collection](postman/postman_collection.json) is included to help you test the API endpoints.
 
 **How to use:**
 
-1. Install Postman and import the collection from `postman/kanmind.postman_collection.json`.
+1. Install Postman and import the collection from `postman/postman_collection.json`.
 2. Set base URL to `http://127.0.0.1:8000/` and adjust further environment variables if necessary.
 3. Use the requests to test and explore API features.
 
