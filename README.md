@@ -60,7 +60,7 @@ A [Postman Collection](postman/kanmind.postman_collection.json) is included to h
 
 **How to use:**
 
-1. Install Postman and import the collection from `postman/KanMind.postman_collection.json`.
+1. Install Postman and import the collection from `postman/kanmind.postman_collection.json`.
 2. Set base URL to `http://127.0.0.1:8000/` and adjust further environment variables if necessary.
 3. Use the requests to test and explore API features.
 
