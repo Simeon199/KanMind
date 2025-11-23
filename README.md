@@ -56,7 +56,7 @@ This is useful for testing permissions, managing users, and accessing protected 
 
 ## API Testing with Postman
 
-A [Postman Collection](postman/KanMind.postman_collection.json) is included to help you test the API endpoints.
+A [Postman Collection](postman/kanmind.postman_collection.json) is included to help you test the API endpoints.
 
 **How to use:**
 

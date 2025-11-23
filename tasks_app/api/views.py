@@ -119,7 +119,6 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     serializer_class = [TaskSerializer]
-    # permission_classes = [IsAuthenticated, IsMemberOfBoard]
 
     def get_permissions(self):
         """

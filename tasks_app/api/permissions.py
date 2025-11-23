@@ -133,8 +133,6 @@ class IsMemberOfBoard(permissions.BasePermission):
 
         return board.members.filter(id=user.id).exists() or board.owner_id == user.id
         
-# Subclasses for specific roles
-
 class IsAuthenticatedAndAssignee(IsAuthenticatedAndRelatedToTask):
     """
     Permission class to ensure the user is authenticated and is an assignee on tasks

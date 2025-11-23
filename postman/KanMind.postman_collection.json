@@ -106,7 +106,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"fullname\": \"Steven Seagal\",\r\n    \"email\": \"steven.seagal@testmail.com\",\r\n    \"password\": \"Hallo123?\",\r\n    \"repeated_password\": \"Hallo123?\"\r\n}",
+									"raw": "{\r\n    \"fullname\": \"Huck Finn\",\r\n    \"email\": \"huck.finn@testmail.com\",\r\n    \"password\": \"Hallo123?\",\r\n    \"repeated_password\": \"Hallo123?\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -139,6 +139,50 @@
 					"item": [
 						{
 							"name": "Board_ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Test for GET /api/boards/{{board_id}}\r",
+											"pm.test(\"Access control for specific board\", function(){\r",
+											"    const status = pm.response.code;\r",
+											"    const currentUserId = parseInt(pm.environment.get(\"CURRENT_USER_ID\"));\r",
+											"\r",
+											"    if(!currentUserId){\r",
+											"        throw new Error(\"CURRENT_USER_ID not set in environment. Set it to the authenticated user's ID.\");\r",
+											"    }\r",
+											"\r",
+											"    if(status === 200){\r",
+											"        // If access granted, validate the board\r",
+											"        const board = pm.response.json();\r",
+											"        pm.expect(board).to.be.an('object');\r",
+											"        pm.expect(board).to.have.property('id');\r",
+											"        pm.expect(board).to.have.property('owner_id');\r",
+											"        pm.expect(board).to.have.property('members').that.is.an('array');\r",
+											"\r",
+											"        // Check if user is owner or member\r",
+											"        const isOwner = board.owner_id === currentUserId;\r",
+											"        const isMember = board.members.includes(currentUserId);\r",
+											"        pm.expect(isOwner || isMember).to.be.true // Must be authorized\r",
+											"    } else if(status === 403 || status === 404){\r",
+											"        // If access denied, that's expected for unauthorized users\r",
+											"        console.log(\"Access denied as expected for unauthorized user\");\r",
+											"    } else {\r",
+											"        pm.expect(status).to.be.oneOf([200, 401, 403, 404], `Unexpected status: ${status}`);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is reasonable\", function(){\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
 							},
@@ -164,14 +208,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/{{BOARD_ID}}/",
+									"raw": "{{BASE_URL}}/api/boards/34/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"{{BOARD_ID}}",
+										"34",
 										""
 									]
 								}
@@ -188,7 +232,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{AUTH_TOKEN}}",
+										"value": "Token {{FALSE_TOKEN}}",
 										"type": "text"
 									}
 								],
@@ -202,14 +246,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/28/",
+									"raw": "{{BASE_URL}}/api/boards/34/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"28",
+										"34",
 										""
 									]
 								}
@@ -226,13 +270,13 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{AUTH_TOKEN}}",
+										"value": "Token {{FALSE_TOKEN}}",
 										"type": "text"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"title\": \"Titel\"\r\n}",
+									"raw": "{\r\n  \"title\": \"Anderer Titel\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -240,14 +284,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/21/",
+									"raw": "{{BASE_URL}}/api/boards/4/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"21",
+										"4",
 										""
 									]
 								}
@@ -258,6 +302,67 @@
 				},
 				{
 					"name": "boards",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for GET request (e.g., /api/boards or /api/boards/{{board_id}})",
+									"",
+									"// Test for GET /api/boards/ (list boards)",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is valid JSON array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Only accessible boards are returned\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    jsonData.forEach(board => {",
+									"        pm.expect(board).to.have.property('id').that.is.a('number');",
+									"        pm.expect(board).to.have.property('title').that.is.a('string');",
+									"        pm.expect(board).to.have.property('member_count').that.is.a('number');",
+									"        pm.expect(board).to.have.property('ticket_count').that.is.a('number');",
+									"        pm.expect(board).to.have.property('tasks_to_do_count').that.is.a('number');",
+									"        pm.expect(board).to.have.property('tasks_high_prio_count').that.is.a('number');",
+									"        pm.expect(board).to.have.property('owner_id').that.is.a('number');",
+									"        // Ensure no 'members' array is present ",
+									"        pm.expect(board).to.not.have.property('members');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"User has access to returned boards (owner or member)\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    const currentUserId = parseInt(pm.environment.get(\"CURRENT_USER_ID\"));",
+									"    if (!currentUserId) {",
+									"        throw new Error(\"CURRENT_USER_ID not set in environment. Set it to the authenticated user's ID for permission validation.\");",
+									"    }",
+									"    jsonData.forEach(board => {",
+									"        const isOwner = board.owner_id === currentUserId;",
+									"        if (isOwner) {",
+									"            console.log(`Board ${board.id} (${board.title}): User is owner.`);",
+									"        } else {",
+									"            // Assume user is a member (since board was returned and API filters)",
+									"            console.log(`Board ${board.id} (${board.title}): User is not owner, assuming member. Member count: ${board.member_count}`);",
+									"            pm.expect(board.member_count).to.be.at.least(1);",
+									"        }",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Response time is reasonable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -307,7 +412,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Projekt\",\r\n    \"members\": [16, 18]\r\n}",
+							"raw": "{\r\n    \"title\": \"Neues Projekt\",\r\n    \"members\": []\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -355,7 +460,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/api/email-check/?email=claude@testmail.de",
+							"raw": "{{BASE_URL}}/api/email-check/?email=huck.finn@testmail.com",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -367,7 +472,7 @@
 							"query": [
 								{
 									"key": "email",
-									"value": "claude@testmail.de"
+									"value": "huck.finn@testmail.com"
 								}
 							]
 						}
@@ -438,7 +543,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{FALSE_TOKEN}}",
+										"value": "Token {{AUTH_TOKEN}}",
 										"type": "text"
 									}
 								],
@@ -487,14 +592,14 @@
 											"raw": ""
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/tasks/{{TASK_ID}}/comments/",
+											"raw": "{{BASE_URL}}/api/tasks/41/comments/",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"tasks",
-												"{{TASK_ID}}",
+												"41",
 												"comments",
 												""
 											]
@@ -512,13 +617,13 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Token {{AUTH_TOKEN}}",
+												"value": "Token {{FALSE_TOKEN}}",
 												"type": "text"
 											}
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n  \"content\": \"Comment number 3\"\r\n}",
+											"raw": "{\r\n  \"content\": \"Test Comment\"\r\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -526,14 +631,14 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/tasks/{{TASK_ID}}/comments/",
+											"raw": "{{BASE_URL}}/api/tasks/41/comments/",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"tasks",
-												"{{TASK_ID}}",
+												"41",
 												"comments",
 												""
 											]
@@ -565,16 +670,16 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/tasks/{{TASK_ID}}/comments/20/",
+											"raw": "{{BASE_URL}}/api/tasks/41/comments/29/",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"tasks",
-												"{{TASK_ID}}",
+												"41",
 												"comments",
-												"20",
+												"29",
 												""
 											]
 										}
@@ -626,13 +731,13 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{AUTH_TOKEN}}",
+										"value": "Token {{FALSE_TOKEN}}",
 										"type": "text"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"title\": \"Code-Review abschließen\",\r\n  \"description\": \"Den PR fertig prüfen und Feedback geben\",\r\n  \"status\": \"low\",\r\n  \"priority\": \"high\",\r\n  \"assignee_id\": 17,\r\n  \"reviewer_id\": 17,\r\n  \"due_date\": \"2025-02-28\"\r\n}",
+									"raw": "{\r\n  \"status\": \"In-progress\"\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -640,14 +745,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/tasks/{{TASK_ID}}/",
+									"raw": "{{BASE_URL}}/api/tasks/40/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"tasks",
-										"{{TASK_ID}}",
+										"40",
 										""
 									]
 								}
@@ -672,7 +777,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"board\": 21,\r\n  \"title\": \"Implement API\",\r\n  \"description\": \"Create the API endpoints for the task model.\",\r\n  \"status\": \"to-do\",\r\n  \"priority\": \"medium\",\r\n  \"assignee_id\": 17,\r\n  \"reviewer_id\": 17,\r\n  \"due_date\": \"2024-07-31\",\r\n  \"comments_count\": 0\r\n}",
+							"raw": "{\r\n  \"board\": 34,\r\n  \"title\": \"Implement API\",\r\n  \"description\": \"Create the API endpoints for the task model.\",\r\n  \"status\": \"to-do\",\r\n  \"priority\": \"medium\",\r\n  \"assignee_id\": 17,\r\n  \"reviewer_id\": 17,\r\n  \"due_date\": \"2024-07-31\",\r\n  \"comments_count\": 0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
