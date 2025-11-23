@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from rest_framework.exceptions import NotFound
 from django.db import models
 from tasks_app.models import Task
 from board_app.models import Board
@@ -43,8 +44,7 @@ class IsMemberOfBoard(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """
-        Check permission for the request, allowing safe methods for authenticated users and verifying board 
-        membership for unsafe methods.
+        Check permission for the request by verifying board membership for all methods.
 
         Args:
            request: The HTTP request object.
@@ -53,9 +53,6 @@ class IsMemberOfBoard(permissions.BasePermission):
         Returns:
            bool: True if the user has permission, False otherwise.
         """
-        if request.method in permissions.SAFE_METHODS:
-            return bool(request.user and request.user.is_authenticated)
-
         board = self._get_board_from_request(request, view)
         if not board:
             return False
@@ -81,6 +78,7 @@ class IsMemberOfBoard(permissions.BasePermission):
     def _get_board_from_request(self, request, view):
         """
         Retrieve the board from the request data or URL parameters.
+        Raise NotFound if the board does not exist.
 
         Args:
            request: The HTTP request object
@@ -95,14 +93,14 @@ class IsMemberOfBoard(permissions.BasePermission):
             try:
                 return Board.objects.get(pk=board_id)
             except Board.DoesNotExist:
-                return None
+                raise NotFound("Board not found")
         
         task_id = view.kwargs.get("pk") or view.kwargs.get("task_id")
         if task_id:
             try:
                 return Task.objects.get(pk=task_id).board
             except Task.DoesNotExist:
-                return None
+                raise NotFound("Task not found.")
         return None
     
     def _get_board_from_object(self, obj):
@@ -191,5 +189,23 @@ class IsCommentAuthor(permissions.BasePermission):
 
         Returns:
            bool: True if the user is the author, False otherwise.
+        """
+        return obj.author == request.user
+    
+class IsTaskCreator(permissions.BasePermission):
+    """
+    Permission class to ensure the user is the creator (author) of the task.
+    Used for DELETE operations on task.
+    """
+
+    def has_permission(self, request, view, obj):
+        """
+        Args:
+           request: The HTTP request object.
+           view: The view being accessed.
+           obj: The Task object being accessed.
+
+        Returns:
+           bool: True if the user is the task creator, False otherwise.
         """
         return obj.author == request.user

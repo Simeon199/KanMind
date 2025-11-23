@@ -1,9 +1,10 @@
 from tasks_app.models import Task, TaskCommentsModel
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsCommentAuthor, IsMemberOfBoard
+from .permissions import IsCommentAuthor, IsMemberOfBoard, IsTaskCreator
 from .serializers import TaskSerializer, TaskCommentsSerializer
 from django.db import models
+from rest_framework.exceptions import NotFound
 
 class TasksAssignedOrReviewedView(generics.ListCreateAPIView):
     """
@@ -117,7 +118,23 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMemberOfBoard]
+    serializer_class = [TaskSerializer]
+    # permission_classes = [IsAuthenticated, IsMemberOfBoard]
+
+    def get_permissions(self):
+        """
+        Return permissions based on the HTTP method:
+        - For DELETE: Only the task creator can delete.
+        - For GET/PATCH: User must be a board member or owner.
+        
+        Returns:
+           list: List of permission instances.
+        """
+        if self.request.method == 'DELETE':
+            return [IsAuthenticated(), IsTaskCreator()]
+        return [IsAuthenticated(), IsMemberOfBoard()]
+
+        
 
     def get_queryset(self):
         """
@@ -128,6 +145,21 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         """
         user = self.request.user
         return Task.objects.filter(board__members=user).distinct()
+    
+    def get_object(self):
+        """
+        Retrieve the tasks object, raising NotFound if the task does not exist.
+
+        Returns:
+           Task: The task instance.
+
+        Raises:
+            NotFound: If the task with the given ID does not exist
+        """
+        try:
+            return super().get_object()
+        except Exception:
+            raise NotFound("Task not found.")
     
 class TaskCommentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     """
