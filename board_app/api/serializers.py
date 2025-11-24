@@ -72,7 +72,7 @@ class BoardSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
              """
              Create a new board instance with the authenticated user as owner.
-             Automatically adds the owner to the board's members if not already included.
+             Members are set from the request data only (owner is not automatically added).
 
              Args:
                 validated_data: The validated data from the request.
@@ -84,8 +84,6 @@ class BoardSerializer(serializers.ModelSerializer):
              validated_data.pop('owner', None)
              board = Board.objects.create(owner=self.context['request'].user, **validated_data)
              board.members.set(members)
-             if board.owner not in board.members.all():
-                  board.members.add(board.owner)
              return board
         
         def update(self, instance, validated_data):
@@ -121,13 +119,33 @@ class SingleBoardSerializer(serializers.ModelSerializer):
          fields = ['id', 'title', 'owner_id', 'members', 'tasks']
 
 class BoardUpdateSerializer(serializers.ModelSerializer):
-     """
-     Serializer for updating a board (PATCH).
-     Excludes tasks and includes owner_data and members_data with full user details.
-     """
-     owner_data = UserShortSerializer(source='owner', read_only=True) 
-     members_data = UserShortSerializer(source='members', many=True, read_only=True) 
+      """
+      Serializer for updating a board (PATCH).
+      Excludes tasks and includes owner_data and members_data with full user details.
+      """
+      owner_data = UserShortSerializer(source='owner', read_only=True) 
+      members_data = UserShortSerializer(source='members', many=True, read_only=True) 
+      members = serializers.PrimaryKeyRelatedField(
+          queryset=User.objects.all(), 
+          many=True, 
+          required=False, 
+      )
 
-     class Meta:
+      class Meta:
           model = Board
-          fields = ['id', 'title', 'owner_data', 'members_data'] 
+          fields = ['id', 'title', 'owner_data', 'members_data', 'members']
+          extra_kwargs = {'members': {'write_only': True}} 
+
+      def to_representation(self, instance):
+           """
+           Customize the output representation to exclude the 'members' field from the response.
+
+           Args:
+              instance: The Board instance.
+
+           Returns:
+              dict: The serialized data without 'members'
+           """
+           data = super().to_representation(instance)
+           data.pop('members', None)
+           return data
