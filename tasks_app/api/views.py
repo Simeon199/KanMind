@@ -1,7 +1,7 @@
 from tasks_app.models import Task, TaskCommentsModel
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsCommentAuthor, IsMemberOfBoard, IsTaskCreator
+from .permissions import IsCommentAuthor, IsMemberOfBoard, IsTaskCreator, IsTaskCreatorOrBoardOwner
 from .serializers import TaskSerializer, TaskCommentsSerializer
 from django.db import models
 from rest_framework.exceptions import NotFound
@@ -69,13 +69,15 @@ class TaskListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         """
-        Return a queryset of tasks from boards where the user is a member.
+        Return a queryset of tasks from boards where the user is a member or owner.
 
         Returns:
             Queryset: Filtered tasks for the authenticated user.
         """
         user = self.request.user
-        return Task.objects.filter(board__members=user).distinct()
+        return Task.objects.filter(
+            models.Q(board__members=user) | models.Q(board__owner=user)
+        ).distinct()
     
 class TaskCommentListView(generics.ListCreateAPIView):
     """
@@ -114,36 +116,37 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     """
     API view for retrieving, updating, and deleting individual tasks.
     Filters tasks to those from boards where the user is a member.
-    Requires the user to be authenticated and a member of the board.
+    Requires the user to be authenticated and a member of the board for GET/PATCH.
+    For DELETE, requires the user to be the task creator or the board owner.
     """
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    serializer_class = [TaskSerializer]
 
     def get_permissions(self):
         """
         Return permissions based on the HTTP method:
-        - For DELETE: Only the task creator can delete.
+        - For DELETE: Only the task creator or board owner can delete.
         - For GET/PATCH: User must be a board member or owner.
         
         Returns:
            list: List of permission instances.
         """
         if self.request.method == 'DELETE':
-            return [IsAuthenticated(), IsTaskCreator()]
+            return [IsAuthenticated(), IsTaskCreatorOrBoardOwner()]
         return [IsAuthenticated(), IsMemberOfBoard()]
-
-        
 
     def get_queryset(self):
         """
-        Return a queryset of tasks from boards where the user is a member.
+        Return a queryset of tasks from boards where the user is a member or owner.
 
         Returns:
             Queryset: Filtered tasks for the authenticated user.
         """
         user = self.request.user
-        return Task.objects.filter(board__members=user).distinct()
+        print("DEBUG: Hit get_queryset for DELETE")
+        return Task.objects.filter(
+            models.Q(board__members=user) | models.Q(board__owner=user)
+        ).distinct()
     
     def get_object(self):
         """

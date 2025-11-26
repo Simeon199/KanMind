@@ -155,6 +155,19 @@ class IsTaskCreatorOrBoardOwner(permissions.BasePermission):
     Ensures the user is the task creator or the board owner.
     """
 
+    def has_permission(self, request, view):
+        """
+        View-level permission: Allow authenticated users to proceed to object-level checks.
+        
+        Args: 
+            request: The HTTP request object.
+            view: The view being accessed.
+
+        Returns:
+            bool: True if the user is authenticated, False otherwise.
+        """
+        return request.user and request.user.is_authenticated
+
     def has_object_permission(self, request, view, obj):
         """
         Check if the user is the task creator or the board owner.
@@ -198,12 +211,26 @@ class IsTaskCreator(permissions.BasePermission):
 
     def has_permission(self, request, view, obj):
         """
+        View-level permission: Allow authenticated users to proceed to object-level
         Args:
            request: The HTTP request object.
            view: The view being accessed.
-           obj: The Task object being accessed.
 
         Returns:
-           bool: True if the user is the task creator, False otherwise.
+           bool: True if the user is authenticated, False otherwise.
+        """
+        return request.user and request.user.is_authenticated
+    
+    def has_object_permission(self, request, view, obj):
+        """
+        Docstring for has_object_permission
+        
+        Args:
+            request: The HTTP request object.
+            view: The view being accessed.
+            obj: The Task object being accessed.
+
+        Returns:
+            bool: True if the user is the task creator, False otherwise.
         """
         return obj.author == request.user

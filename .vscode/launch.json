@@ -4,18 +4,24 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
-    
-    
+
+
         {
             "name": "Python Debugger: Django",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}\\manage.py",
             "args": [
-                "runserver"
+                "runserver",
+                "8000"
             ],
-            "django": true
+            "django": true,
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "core.settings"
+            },
+            "console": "integratedTerminal",
+            "python": "${workspaceFolder}/env/Scripts/python.exe"
         }
     ]
 }

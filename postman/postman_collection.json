@@ -46,6 +46,59 @@
 						},
 						{
 							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Login status and response validation\", function(){",
+											"    const status = pm.response.code;",
+											"    const jsonData = pm.response.json();",
+											"",
+											"    // Successfull Login",
+											"    if(status == 200){",
+											"        pm.expect(jsonData).to.have.property('token').that.is.a('string');",
+											"        pm.expect(jsonData).to.have.property('fullname').that.is.a('string');",
+											"        pm.expect(jsonData).to.have.property('email').that.is.a('string');",
+											"        pm.expect(jsonData).to.have.property('user_id').that.is.a('number');",
+											"        console.log(\"Login successful: User created with token\");",
+											"    } else if(status == 400){",
+											"        pm.expect(jsonData).to.be.an('object'); // Validation errors",
+											"        pm.expect(jsonData).to.have.property('error').or.have.property('email'); // e.g., \"Passwords do not match\" or \"Email already exists\"",
+											"        console.log(\"Login failed: Invalid data as expected\");",
+											"    } else if(status == 500){",
+											"        console.log(\"Internal server error: Check server logs\");",
+											"    } else {",
+											"        pm.expect(status).to.be.oneOf([200, 400, 500], `Unexpected status: ${status}`);",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Request body structure validation\", function(){",
+											"    const requestBody = JSON.parse(pm.request.body.raw);",
+											"    pm.expect(requestBody).to.have.property('email').that.is.a('string');",
+											"    pm.expect(requestBody).to.have.property('password').that.is.a('string');",
+											"});",
+											"",
+											"pm.test(\"Password correctness inferred from response\", function(){",
+											"    const status = pm.response.code;",
+											"    if(status === 200){",
+											"        console.log(\"Password is correct.\");",
+											"    } else if(status === 400){",
+											"        console.log(\"Password is incorrect or user does not exist.\");",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Response time is reasonable\", function(){",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "apikey"
@@ -54,7 +107,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"email\": \"brad-pitt@testmail.de\",\r\n  \"password\": \"Hallo123?\"\r\n}",
+									"raw": "{\r\n  \"email\": \"tom.sawyer@testmail.com\",\r\n  \"password\": \"Hallo123?\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -74,6 +127,64 @@
 								}
 							},
 							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									"pm.test(\"Login status and response validation\", function(){\r",
+									"    const status = pm.response.code;\r",
+									"    const jsonData = pm.response.json();\r",
+									"\r",
+									"    // Successfull Registration\r",
+									"    if(status == 200){\r",
+									"        pm.expect(jsonData).to.have.property('token').that.is.a('string');\r",
+									"        pm.expect(jsonData).to.have.property('fullname').that.is.a('string');\r",
+									"        pm.expect(jsonData).to.have.property('email').that.is.a('string');\r",
+									"        pm.expect(jsonData).to.have.property('user_id').that.is.a('number');\r",
+									"        console.log(\"Registration successfull: User created with token\");\r",
+									"    } else if(status == 400){\r",
+									"        pm.expect(jsonData).to.be.an('object'); // Validation errors\r",
+									"        pm.expect(jsonData).to.have.property('error').or.have.property('email'); // e.g., \"Passwords do not match\" or \"Email already exists\"\r",
+									"        console.log(\"Registration failed: Invalid data as expected\");\r",
+									"    } else if(status == 500){\r",
+									"        console.log(\"Interval server error: Check server logs\");\r",
+									"    } else {\r",
+									"        pm.expect(status).to.be.oneOf([201, 400, 500], `Unexpected status: ${status}`);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Form structure validation\", function(){\r",
+									"    const requestBody = JSON.parse(pm.request.body.raw)\r",
+									"    \r",
+									"    // Check required fields for Registration\r",
+									"    pm.expect(requestBody).to.have.property('fullname').that.is.a('string');\r",
+									"    pm.expect(requestBody).to.have.property('email').that.is.a('string');\r",
+									"    pm.expect(requestBody).to.have.property('password').that.is.a('string');\r",
+									"    pm.expect(requestBody).to.have.property('repeated_password').that.is.a('string');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is reasonable\", function(){\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});"
+								]
+							}
 						}
 					]
 				},
@@ -101,12 +212,59 @@
 						},
 						{
 							"name": "register",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Registration status and response validation\", function(){\r",
+											"    const status = pm.response.code;\r",
+											"    const jsonData = pm.response.json();\r",
+											"\r",
+											"    // Successfull Registration\r",
+											"    if(status == 200){\r",
+											"        pm.expect(jsonData).to.have.property('token').that.is.a('string');\r",
+											"        pm.expect(jsonData).to.have.property('fullname').that.is.a('string');\r",
+											"        pm.expect(jsonData).to.have.property('email').that.is.a('string');\r",
+											"        pm.expect(jsonData).to.have.property('user_id').that.is.a('number');\r",
+											"        console.log(\"Registration successfull: User created with token\");\r",
+											"    } else if(status == 400){\r",
+											"        pm.expect(jsonData).to.be.an('object'); // Validation errors\r",
+											"        pm.expect(jsonData).to.have.property('error').or.have.property('email'); // e.g., \"Passwords do not match\" or \"Email already exists\"\r",
+											"        console.log(\"Registration failed: Invalid data as expected\");\r",
+											"    } else if(status == 500){\r",
+											"        console.log(\"Interval server error: Check server logs\");\r",
+											"    } else {\r",
+											"        pm.expect(status).to.be.oneOf([201, 400, 500], `Unexpected status: ${status}`);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Form structure validation\", function(){\r",
+											"    const requestBody = JSON.parse(pm.request.body.raw)\r",
+											"    \r",
+											"    // Check required fields for Registration\r",
+											"    pm.expect(requestBody).to.have.property('fullname').that.is.a('string');\r",
+											"    pm.expect(requestBody).to.have.property('email').that.is.a('string');\r",
+											"    pm.expect(requestBody).to.have.property('password').that.is.a('string');\r",
+											"    pm.expect(requestBody).to.have.property('repeated_password').that.is.a('string');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is reasonable\", function(){\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"fullname\": \"Huck Finn\",\r\n    \"email\": \"huck.finn@testmail.com\",\r\n    \"password\": \"Hallo123?\",\r\n    \"repeated_password\": \"Hallo123?\"\r\n}",
+									"raw": "{\r\n    \"fullname\": \"Tom Sawyer\",\r\n    \"email\": \"tom.sawyer@testmail.com\",\r\n    \"password\": \"Hallo123?\",\r\n    \"repeated_password\": \"Hallo123?\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -224,6 +382,59 @@
 						},
 						{
 							"name": "Board_ID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Delete permission check\", function(){\r",
+											"    const status = pm.response.code;\r",
+											"\r",
+											"    // For owner deleting their board\r",
+											"    if(status === 204){\r",
+											"        pm.expect(pm.response.text()).to.equal(''), // No content in response\r",
+											"        console.log(\"Board deleted successfully by owner\");\r",
+											"    }\r",
+											"\r",
+											"    // For non-owner trying to delete\r",
+											"    else if(status === 403){\r",
+											"        pm.expect(pm.response.json()).to.have.property('detail').that.includes('permission');\r",
+											"        console.log(\"Delete denied for non-owner\");\r",
+											"    }\r",
+											"\r",
+											"    // For non-existent board\r",
+											"    else if(status === 404){\r",
+											"        pm.expect(pm.response.json()).to.have.property('detail').that.equals('No Board matches the given query.');\r",
+											"        console.log(\"Board not found\");\r",
+											"    }\r",
+											"\r",
+											"    // Unexpected status \r",
+											"    else {\r",
+											"        pm.expect(status).to.be.oneOf([204, 403, 404], `Unexpected status: ${status}`);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is reasonable\", function(){\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "apikey"
@@ -232,7 +443,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{FALSE_TOKEN}}",
+										"value": "Token {{AUTH_TOKEN}}",
 										"type": "text"
 									}
 								],
@@ -246,14 +457,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/34/",
+									"raw": "{{BASE_URL}}/api/boards/41/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"34",
+										"41",
 										""
 									]
 								}
@@ -262,6 +473,48 @@
 						},
 						{
 							"name": "Board_ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Test for PATCH /api/boards/{{board_id}}",
+											"",
+											"pm.test(\"Access control for specific board\", function(){",
+											"    const status = pm.response.code;",
+											"    const currentUserId = parseInt(pm.environment.get(\"CURRENT_USER_ID\"));",
+											"",
+											"    if(!currentUserId){",
+											"        throw new Error(\"CURRENT_USER_ID not set in environment. Set it to the authenticated user's ID.\");",
+											"    }",
+											"",
+											"    if(status === 200){",
+											"        const board = pm.response.json();",
+											"        pm.expect(board).to.be.an('object');",
+											"        pm.expect(board).to.have.property('id');",
+											"        pm.expect(board).to.have.property('title');",
+											"        pm.expect(board).to.have.property('owner_data');",
+											"        pm.expect(board).to.have.property('members_data').that.is.an('array');",
+											"        const isOwner = board.owner_data && board.owner_data.id === currentUserId;",
+											"        const isMember = Array.isArray(board.members_data) && board.members_data.some(member => member.id === currentUserId)",
+											"        pm.expect(isOwner || isMember).to.be.true; ",
+											"    } else if(status === 403 || status === 404){",
+											"        console.log(\"Access denied as expected for unauthorized user\");",
+											"    } else {",
+											"        pm.expect(status).to.be.oneOf([200, 401, 403, 404], `Unexpected status: ${status}`);",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Response time is reasonable\", function(){",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "apikey"
@@ -270,13 +523,13 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{FALSE_TOKEN}}",
+										"value": "Token {{AUTH_TOKEN}}",
 										"type": "text"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"title\": \"Anderer Titel\"\r\n}",
+									"raw": "{\r\n  \"members\": [16]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -284,14 +537,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/4/",
+									"raw": "{{BASE_URL}}/api/boards/36/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"4",
+										"36",
 										""
 									]
 								}
@@ -398,6 +651,52 @@
 				},
 				{
 					"name": "boards",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function(){\r",
+									"    pm.response.json(); // Ensures the response is parseable JSON\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has correct structure for created board\", function(){\r",
+									"    const jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check required fields\r",
+									"    pm.expect(jsonData).to.have.property('id').that.is.a('number');\r",
+									"    pm.expect(jsonData).to.have.property('title').that.is.a('string');\r",
+									"    pm.expect(jsonData).to.have.property('ticket_count').that.is.a('number');\r",
+									"    pm.expect(jsonData).to.have.property('tasks_to_do_count').that.is.a('number');\r",
+									"    pm.expect(jsonData).to.have.property('tasks_high_prio_count').that.is.a('number');\r",
+									"    pm.expect(jsonData).to.have.property('owner_id').that.is.a('number');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is reasonable\", function(){\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "apikey"
@@ -412,7 +711,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Neues Projekt\",\r\n    \"members\": []\r\n}",
+							"raw": "{\r\n    \"title\": \"Großes Projekt\",\r\n    \"members\": [14, 15, 16]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -435,6 +734,61 @@
 				},
 				{
 					"name": "email-check",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Authentication and status check\", function () {\r",
+									"    const status = pm.response.code;\r",
+									"    \r",
+									"    // For authenticated requests with valid email\r",
+									"    if (status === 200) {\r",
+									"        pm.expect(pm.response.json()).to.be.an('object');\r",
+									"        pm.expect(pm.response.json()).to.have.property('id').that.is.a('number');\r",
+									"        pm.expect(pm.response.json()).to.have.property('email').that.is.a('string');\r",
+									"        pm.expect(pm.response.json()).to.have.property('fullname').that.is.a('string');\r",
+									"        console.log(\"User found successfully\");\r",
+									"    }\r",
+									"    \r",
+									"    // For authenticated requests with invalid email\r",
+									"    else if (status === 404) {\r",
+									"        pm.expect(pm.response.json()).to.have.property('detail').that.equals('User not found');\r",
+									"        console.log(\"User not found as expected\");\r",
+									"    }\r",
+									"    \r",
+									"    // Unexpected status (e.g., 400 for missing email, or 401 for unauth)\r",
+									"    else {\r",
+									"        pm.expect(status).to.be.oneOf([200, 404, 400, 401], `Unexpected status: ${status}`);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is reasonable\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Email parameter validation\", function () {\r",
+									"    const email = pm.request.url.query.get('email');\r",
+									"    pm.expect(email).to.not.be.undefined; // Ensure email is provided in the request\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -460,7 +814,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/api/email-check/?email=huck.finn@testmail.com",
+							"raw": "{{BASE_URL}}/api/email-check/?email=brad-pitt@testmail.de",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -472,7 +826,7 @@
 							"query": [
 								{
 									"key": "email",
-									"value": "huck.finn@testmail.com"
+									"value": "brad-pitt@testmail.de"
 								}
 							]
 						}
@@ -489,6 +843,84 @@
 					"item": [
 						{
 							"name": "tasks",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 OK\", function(){\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is a valid Array\", function(){\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.be.an('array');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Each task has correct structure and user is authenticated board member\", function(){\r",
+											"    const jsonData = pm.response.json();\r",
+											"    const currentUserId = parseInt(pm.environment.get(\"CURRENT_USER_ID\"));\r",
+											"\r",
+											"    if(!currentUserId){\r",
+											"        throw new Error(\"CURRENT_USER_ID not set in environment. Set it to the authenticated user's ID.\");\r",
+											"    }\r",
+											"\r",
+											"    // Check top-level fields\r",
+											"    jsonData.forEach(function(task){\r",
+											"        pm.expect(task).to.have.property('id').that.is.a('number');\r",
+											"        pm.expect(task).to.have.property('board').that.is.a('number');\r",
+											"        pm.expect(task).to.have.property('title').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('description').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('status').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('priority').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('due_date').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('comments_count').that.is.a('number');\r",
+											"\r",
+											"        // Check nested assignee object\r",
+											"        pm.expect(task).to.have.property('assignee');\r",
+											"        if(task.assignee === null){\r",
+											"            pm.expect(task.assignee).to.equal(null);\r",
+											"        } else {\r",
+											"            pm.expect(task.assignee).to.be.an('object');\r",
+											"            pm.expect(task.assignee).to.have.property('id').that.is.a('number');\r",
+											"            pm.expect(task.assignee).to.have.property('email').that.is.a('string');\r",
+											"            pm.expect(task.assignee).to.have.property('fullname').that.is.a('string');\r",
+											"        }\r",
+											"\r",
+											"        // Check nested reviewer object\r",
+											"        pm.expect(task).to.have.property('reviewer');\r",
+											"        if(task.reviewer === null){\r",
+											"            pm.expect(task.reviewer).to.equal(null);\r",
+											"        } else {\r",
+											"            pm.expect(task.reviewer).to.be.an('object');\r",
+											"            pm.expect(task.reviewer).to.have.property('id').that.is.a('number');\r",
+											"            pm.expect(task.reviewer).to.have.property('email').that.is.a('string');\r",
+											"            pm.expect(task.reviewer).to.have.property('fullname').that.is.a('string');   \r",
+											"        }\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is reasonable\", function(){\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000)\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
 							},
@@ -535,6 +967,73 @@
 					"item": [
 						{
 							"name": "tasks",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 OK\", function(){\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is a valid Array\", function(){\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.be.an('array');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Each task has correct structure and user is authenticated board member\", function(){\r",
+											"    const jsonData = pm.response.json();\r",
+											"    const currentUserId = parseInt(pm.environment.get(\"CURRENT_USER_ID\"));\r",
+											"\r",
+											"    if(!currentUserId){\r",
+											"        throw new Error(\"CURRENT_USER_ID not set in environment. Set it to the authenticated user's ID.\");\r",
+											"    }\r",
+											"\r",
+											"    // Check top-level fields\r",
+											"    jsonData.forEach(function(task){\r",
+											"        pm.expect(task).to.have.property('id').that.is.a('number');\r",
+											"        pm.expect(task).to.have.property('board').that.is.a('number');\r",
+											"        pm.expect(task).to.have.property('title').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('description').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('status').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('priority').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('due_date').that.is.a('string');\r",
+											"        pm.expect(task).to.have.property('comments_count').that.is.a('number');\r",
+											"\r",
+											"        // Check nested assignee object\r",
+											"        pm.expect(task).to.have.property('assignee');\r",
+											"        if(task.assignee === null){\r",
+											"            pm.expect(task.assignee).to.equal(null);\r",
+											"        } else {\r",
+											"            pm.expect(task.assignee).to.be.an('object');\r",
+											"            pm.expect(task.assignee).to.have.property('id').that.is.a('number');\r",
+											"            pm.expect(task.assignee).to.have.property('email').that.is.a('string');\r",
+											"            pm.expect(task.assignee).to.have.property('fullname').that.is.a('string');\r",
+											"        }\r",
+											"\r",
+											"        // Check nested reviewer object\r",
+											"        pm.expect(task).to.have.property('reviewer');\r",
+											"        if(task.reviewer === null){\r",
+											"            pm.expect(task.reviewer).to.equal(null);\r",
+											"        } else {\r",
+											"            pm.expect(task.reviewer).to.be.an('object');\r",
+											"            pm.expect(task.reviewer).to.have.property('id').that.is.a('number');\r",
+											"            pm.expect(task.reviewer).to.have.property('email').that.is.a('string');\r",
+											"            pm.expect(task.reviewer).to.have.property('fullname').that.is.a('string');   \r",
+											"        }\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is reasonable\", function(){\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000)\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "apikey"
@@ -690,6 +1189,41 @@
 						},
 						{
 							"name": "task_id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// pm.test(\"Delete permission check\", function(){",
+											"//     const status = pm.response.code;",
+											"//     if(status === 204){",
+											"//         pm.expect(pm.response.text()).to.equal(''), // No content in response",
+											"//         console.log(\"Task deleted successfully by owner\");",
+											"//     }",
+											"//     else if(status === 403){",
+											"//         pm.expect(pm.response.json()).to.have.property('detail').that.includes('permission');",
+											"//         console.log(\"Delete denied for non-owner\");",
+											"//     }",
+											"//     else if(status === 401){",
+											"//         pm.expect(pm.response.json()).to.have.property('detail').that.matches(/not authenticated|permission/i);",
+											"//         console.log(\"Delete denied: user not authenticated or lacks permission\");",
+											"//     }",
+											"//     else if(status === 404){",
+											"//         pm.expect(pm.response.json()).to.have.property('detail').that.equals('No Task matches the given query.');",
+											"//         console.log(\"No Task matches the given query\");",
+											"//     }",
+											"// });",
+											"",
+											"// pm.test(\"Response time is reasonable\", function(){",
+											"//     pm.expect(pm.response.responseTime).to.be.below(2000);",
+											"// });"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "apikey"
@@ -700,21 +1234,31 @@
 										"key": "Authorization",
 										"value": "Token {{AUTH_TOKEN}}",
 										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": ""
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/tasks/33/",
+									"raw": "{{BASE_URL}}/api/tasks/41/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"tasks",
-										"33",
+										"41",
 										""
 									]
 								}
@@ -723,6 +1267,48 @@
 						},
 						{
 							"name": "task_id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Test for PATCH /api/boards/{{board_id}}\r",
+											"\r",
+											"// pm.test(\"Access control for specific board\", function(){\r",
+											"//     const status = pm.response.code;\r",
+											"//     const currentUserId = parseInt(pm.environment.get(\"CURRENT_USER_ID\"));\r",
+											"\r",
+											"//     if(!currentUserId){\r",
+											"//         throw new Error(\"CURRENT_USER_ID not set in environment. Set it to the authenticated user's ID.\");\r",
+											"//     }\r",
+											"\r",
+											"//     if(status === 200){\r",
+											"//         const board = pm.response.json();\r",
+											"//         pm.expect(board).to.be.an('object');\r",
+											"//         pm.expect(board).to.have.property('id');\r",
+											"//         pm.expect(board).to.have.property('title');\r",
+											"//         pm.expect(board).to.have.property('owner_data');\r",
+											"//         pm.expect(board).to.have.property('members_data').that.is.an('array');\r",
+											"//         const isOwner = board.owner_data && board.owner_data.id === currentUserId;\r",
+											"//         const isMember = Array.isArray(board.members_data) && board.members_data.some(member => member.id === currentUserId)\r",
+											"//         pm.expect(isOwner || isMember).to.be.true; \r",
+											"//     } else if(status === 403 || status === 404){\r",
+											"//         console.log(\"Access denied as expected for unauthorized user\");\r",
+											"//     } else {\r",
+											"//         pm.expect(status).to.be.oneOf([200, 401, 403, 404], `Unexpected status: ${status}`);\r",
+											"//     }\r",
+											"// });\r",
+											"\r",
+											"// pm.test(\"Response time is reasonable\", function(){\r",
+											"//     pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+											"// });"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "apikey"
@@ -731,13 +1317,16 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{FALSE_TOKEN}}",
-										"type": "text"
+										"value": "Token {{AUTH_TOKEN}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"status\": \"In-progress\"\r\n}\r\n",
+									"raw": "{\r\n  \"status\": \"Done\"\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -745,14 +1334,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/tasks/40/",
+									"raw": "{{BASE_URL}}/api/tasks/41/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"tasks",
-										"40",
+										"41",
 										""
 									]
 								}
@@ -763,6 +1352,73 @@
 				},
 				{
 					"name": "tasks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function(){\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON object\", function(){\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.be.an('object');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Task creation requirements met\", function(){\r",
+									"    const jsonData = pm.response.json();\r",
+									"    const currentUserId = parseInt(pm.environment.get(\"CURRENT_USER_ID\"));\r",
+									"    if(!currentUserId){\r",
+									"        throw new Error(\"CURRENT_USER_ID not set in environment. Set it to the authenticated user's id\");\r",
+									"    }\r",
+									"\r",
+									"    // Check top-level fields (matching the response structure)\r",
+									"    pm.expect(jsonData).to.have.property('id').that.is.a('number');\r",
+									"    pm.expect(jsonData).to.have.property('board').that.is.a('number');\r",
+									"    pm.expect(jsonData).to.have.property('title').that.is.a('string');\r",
+									"    pm.expect(jsonData).to.have.property('description').that.is.a('string');\r",
+									"    pm.expect(jsonData).to.have.property('status').that.is.a('string');\r",
+									"    pm.expect(jsonData).to.have.property('priority').that.is.a('string');\r",
+									"    pm.expect(jsonData).to.have.property('due_date').that.is.a('string');\r",
+									"    pm.expect(jsonData).to.have.property('comments_count').that.is.a('number');\r",
+									"\r",
+									"    // Check assignee: Can be null or an object with valid member details\r",
+									"    if(jsonData.assignee === null){\r",
+									"        console.log(\"Assignee is null as expected\");\r",
+									"    } else {\r",
+									"        pm.expect(jsonData.assignee).to.be.an('object');\r",
+									"        pm.expect(jsonData.assignee).to.have.property('id').that.is.a('number');\r",
+									"        pm.expect(jsonData.assignee).to.have.property('email').that.is.a('string');\r",
+									"        pm.expect(jsonData.assignee).to.have.property('fullname').that.is.a('string');\r",
+									"        console.log(\"Assignee is a valid board member\");\r",
+									"    }\r",
+									"\r",
+									"    // Check reviewer: Can be null or an object with valid member details\r",
+									"    if(jsonData.reviewer === null){\r",
+									"        console.log(\"Assignee is null as expected\");\r",
+									"    } else {\r",
+									"        pm.expect(jsonData.reviewer).to.be.an('object');\r",
+									"        pm.expect(jsonData.reviewer).to.have.property('id').that.is.a('number');\r",
+									"        pm.expect(jsonData.reviewer).to.have.property('email').that.is.a('string');\r",
+									"        pm.expect(jsonData.reviewer).to.have.property('fullname').that.is.a('string');\r",
+									"        console.log(\"Reviewer is a valid board member\");\r",
+									"    }\r",
+									"    \r",
+									"    // Implicit: Creator (current user) is authenticated and a board member (permissions enforce this)\r",
+									"    // Assignee/Reviewer validation is handled by serializer (test invalid cases separately for 400)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is reasonable\", function(){\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "apikey"
@@ -777,7 +1433,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"board\": 34,\r\n  \"title\": \"Implement API\",\r\n  \"description\": \"Create the API endpoints for the task model.\",\r\n  \"status\": \"to-do\",\r\n  \"priority\": \"medium\",\r\n  \"assignee_id\": 17,\r\n  \"reviewer_id\": 17,\r\n  \"due_date\": \"2024-07-31\",\r\n  \"comments_count\": 0\r\n}",
+							"raw": "{\r\n  \"board\": 34,\r\n  \"title\": \"Implement API\",\r\n  \"description\": \"Create the API endpoints for the task model.\",\r\n  \"status\": \"to-do\",\r\n  \"priority\": \"medium\",\r\n  \"assignee_id\": 16,\r\n  \"reviewer_id\": 16,\r\n  \"due_date\": \"2024-07-31\",\r\n  \"comments_count\": 0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
