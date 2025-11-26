@@ -143,10 +143,15 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             Queryset: Filtered tasks for the authenticated user.
         """
         user = self.request.user
-        print("DEBUG: Hit get_queryset for DELETE")
-        return Task.objects.filter(
-            models.Q(board__members=user) | models.Q(board__owner=user)
-        ).distinct()
+        q_object = models.Q(board__members=user) | models.Q(board__owner=user)
+        print(f"DEBUG: Q object: {q_object}")
+        queryset = Task.objects.filter(q_object).distinct()
+        print(f"DEBUG: Queryset count: {queryset.count()}, Task IDs: {list(queryset.values_list('id', flat=True))}")
+        return queryset
+        # user = self.request.user
+        # return Task.objects.filter(
+        #     models.Q(board__members=user) | models.Q(board__owner=user)
+        # ).distinct()
     
     def get_object(self):
         """
