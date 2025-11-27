@@ -51,46 +51,6 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Login status and response validation\", function(){",
-											"    const status = pm.response.code;",
-											"    const jsonData = pm.response.json();",
-											"",
-											"    // Successfull Login",
-											"    if(status == 200){",
-											"        pm.expect(jsonData).to.have.property('token').that.is.a('string');",
-											"        pm.expect(jsonData).to.have.property('fullname').that.is.a('string');",
-											"        pm.expect(jsonData).to.have.property('email').that.is.a('string');",
-											"        pm.expect(jsonData).to.have.property('user_id').that.is.a('number');",
-											"        console.log(\"Login successful: User created with token\");",
-											"    } else if(status == 400){",
-											"        pm.expect(jsonData).to.be.an('object'); // Validation errors",
-											"        pm.expect(jsonData).to.have.property('error').or.have.property('email'); // e.g., \"Passwords do not match\" or \"Email already exists\"",
-											"        console.log(\"Login failed: Invalid data as expected\");",
-											"    } else if(status == 500){",
-											"        console.log(\"Internal server error: Check server logs\");",
-											"    } else {",
-											"        pm.expect(status).to.be.oneOf([200, 400, 500], `Unexpected status: ${status}`);",
-											"    }",
-											"});",
-											"",
-											"pm.test(\"Request body structure validation\", function(){",
-											"    const requestBody = JSON.parse(pm.request.body.raw);",
-											"    pm.expect(requestBody).to.have.property('email').that.is.a('string');",
-											"    pm.expect(requestBody).to.have.property('password').that.is.a('string');",
-											"});",
-											"",
-											"pm.test(\"Password correctness inferred from response\", function(){",
-											"    const status = pm.response.code;",
-											"    if(status === 200){",
-											"        console.log(\"Password is correct.\");",
-											"    } else if(status === 400){",
-											"        console.log(\"Password is incorrect or user does not exist.\");",
-											"    }",
-											"});",
-											"",
-											"pm.test(\"Response time is reasonable\", function(){",
-											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-											"});",
 											""
 										],
 										"type": "text/javascript",
@@ -148,41 +108,7 @@
 								"packages": {},
 								"requests": {},
 								"exec": [
-									"pm.test(\"Login status and response validation\", function(){\r",
-									"    const status = pm.response.code;\r",
-									"    const jsonData = pm.response.json();\r",
-									"\r",
-									"    // Successfull Registration\r",
-									"    if(status == 200){\r",
-									"        pm.expect(jsonData).to.have.property('token').that.is.a('string');\r",
-									"        pm.expect(jsonData).to.have.property('fullname').that.is.a('string');\r",
-									"        pm.expect(jsonData).to.have.property('email').that.is.a('string');\r",
-									"        pm.expect(jsonData).to.have.property('user_id').that.is.a('number');\r",
-									"        console.log(\"Registration successfull: User created with token\");\r",
-									"    } else if(status == 400){\r",
-									"        pm.expect(jsonData).to.be.an('object'); // Validation errors\r",
-									"        pm.expect(jsonData).to.have.property('error').or.have.property('email'); // e.g., \"Passwords do not match\" or \"Email already exists\"\r",
-									"        console.log(\"Registration failed: Invalid data as expected\");\r",
-									"    } else if(status == 500){\r",
-									"        console.log(\"Interval server error: Check server logs\");\r",
-									"    } else {\r",
-									"        pm.expect(status).to.be.oneOf([201, 400, 500], `Unexpected status: ${status}`);\r",
-									"    }\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Form structure validation\", function(){\r",
-									"    const requestBody = JSON.parse(pm.request.body.raw)\r",
-									"    \r",
-									"    // Check required fields for Registration\r",
-									"    pm.expect(requestBody).to.have.property('fullname').that.is.a('string');\r",
-									"    pm.expect(requestBody).to.have.property('email').that.is.a('string');\r",
-									"    pm.expect(requestBody).to.have.property('password').that.is.a('string');\r",
-									"    pm.expect(requestBody).to.have.property('repeated_password').that.is.a('string');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response time is reasonable\", function(){\r",
-									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
-									"});"
+									""
 								]
 							}
 						}
@@ -217,41 +143,7 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Registration status and response validation\", function(){\r",
-											"    const status = pm.response.code;\r",
-											"    const jsonData = pm.response.json();\r",
-											"\r",
-											"    // Successfull Registration\r",
-											"    if(status == 200){\r",
-											"        pm.expect(jsonData).to.have.property('token').that.is.a('string');\r",
-											"        pm.expect(jsonData).to.have.property('fullname').that.is.a('string');\r",
-											"        pm.expect(jsonData).to.have.property('email').that.is.a('string');\r",
-											"        pm.expect(jsonData).to.have.property('user_id').that.is.a('number');\r",
-											"        console.log(\"Registration successfull: User created with token\");\r",
-											"    } else if(status == 400){\r",
-											"        pm.expect(jsonData).to.be.an('object'); // Validation errors\r",
-											"        pm.expect(jsonData).to.have.property('error').or.have.property('email'); // e.g., \"Passwords do not match\" or \"Email already exists\"\r",
-											"        console.log(\"Registration failed: Invalid data as expected\");\r",
-											"    } else if(status == 500){\r",
-											"        console.log(\"Interval server error: Check server logs\");\r",
-											"    } else {\r",
-											"        pm.expect(status).to.be.oneOf([201, 400, 500], `Unexpected status: ${status}`);\r",
-											"    }\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Form structure validation\", function(){\r",
-											"    const requestBody = JSON.parse(pm.request.body.raw)\r",
-											"    \r",
-											"    // Check required fields for Registration\r",
-											"    pm.expect(requestBody).to.have.property('fullname').that.is.a('string');\r",
-											"    pm.expect(requestBody).to.have.property('email').that.is.a('string');\r",
-											"    pm.expect(requestBody).to.have.property('password').that.is.a('string');\r",
-											"    pm.expect(requestBody).to.have.property('repeated_password').that.is.a('string');\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Response time is reasonable\", function(){\r",
-											"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
-											"});"
+											""
 										],
 										"type": "text/javascript",
 										"packages": {},
@@ -366,14 +258,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/34/",
+									"raw": "{{BASE_URL}}/api/boards/44/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"34",
+										"44",
 										""
 									]
 								}
@@ -457,14 +349,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/41/",
+									"raw": "{{BASE_URL}}/api/boards/34/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"41",
+										"34",
 										""
 									]
 								}
@@ -529,7 +421,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"members\": [16]\r\n}",
+									"raw": "{\r\n  \"members\": [16, 17]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -537,14 +429,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/36/",
+									"raw": "{{BASE_URL}}/api/boards/34/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"36",
+										"34",
 										""
 									]
 								}
@@ -711,7 +603,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Großes Projekt\",\r\n    \"members\": [14, 15, 16]\r\n}",
+							"raw": "{\r\n    \"title\": \"Testprojekt\",\r\n    \"members\": [14, 15, 16]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1071,6 +963,45 @@
 							"item": [
 								{
 									"name": "comments",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200 OK\", function(){\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response is valid JSON array\", function(){\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData).to.be.an('array');\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Comments are accessible only to authenticated board members\", function(){\r",
+													"    const jsonData = pm.response.json();\r",
+													"    jsonData.forEach(comment => {\r",
+													"        pm.expect(comment).to.have.property('id').that.is.a('number');\r",
+													"        pm.expect(comment).to.have.property('created_at').that.is.a('string');\r",
+													"        pm.expect(comment).to.have.property('author').that.is.a('string');\r",
+													"        pm.expect(comment).to.have.property('content').that.is.a('string');\r",
+													"    \r",
+													"        // Optional: Validate created_at is a valid date\r",
+													"        const createdAt = new Date(comemnt.created_at);\r",
+													"        pm.expect(createdAt).to.be.a('date').and.not.be.NaN;\r",
+													"    });\r",
+													"    console.log(`Retrieved ${jsonData.length} comments for task (user is board member)`);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response time is reasonable\", function(){\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+													"})"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
 									"protocolProfileBehavior": {
 										"disableBodyPruning": true
 									},
@@ -1091,14 +1022,14 @@
 											"raw": ""
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/tasks/41/comments/",
+											"raw": "{{BASE_URL}}/api/tasks/53/comments/",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"tasks",
-												"41",
+												"53",
 												"comments",
 												""
 											]
@@ -1108,6 +1039,50 @@
 								},
 								{
 									"name": "comments",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 201 Created\", function(){\r",
+													"    pm.response.to.have.status(201);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response is valid JSON object\", function(){\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData).to.be.an('object');\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Comment creation requires board membership\", function(){\r",
+													"    const jsonData = pm.response.json();\r",
+													"\r",
+													"    // Check comment structure\r",
+													"    pm.expect(jsonData).to.have.property('id').that.is.a('number');\r",
+													"    pm.expect(jsonData).to.have.property('created_at').that.is.a('string');\r",
+													"    pm.expect(jsonData).to.have.property('author').that.is.a('string');\r",
+													"    pm.expect(jsonData).to.have.property('content').that.is.a('string');\r",
+													"\r",
+													"    // Optional: Validate created_at is a valid state\r",
+													"    const createdAt = new Date(jsonData.created_at);\r",
+													"    pm.expect(createdAt).to.be.a('date').and.not.be.NaN;\r",
+													"\r",
+													"    // Optional: Check that content matches the request\r",
+													"    const requestBody = JSON.parse(pm.request.body.raw);\r",
+													"    pm.expect(jsonData.content).to.equal(requestBody.content);\r",
+													"\r",
+													"    console.log(\"Comment created successfully (user is board member)\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response time is reasonable\", function(){\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
 									"request": {
 										"auth": {
 											"type": "apikey"
@@ -1130,14 +1105,14 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/tasks/41/comments/",
+											"raw": "{{BASE_URL}}/api/tasks/53/comments/",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"tasks",
-												"41",
+												"53",
 												"comments",
 												""
 											]
@@ -1147,6 +1122,33 @@
 								},
 								{
 									"name": "comments",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 204 No Content\", function(){\r",
+													"    pm.response.to.have.status(204);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response body is empty\", function(){\r",
+													"    pm.expect(pm.response.text()).to.equal('');\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Comment deletion requires being the author\", function(){\r",
+													"    console.log(\"Comment deleted successfully (user is the author)\");    \r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response time is reasonable\", function(){\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
 									"request": {
 										"auth": {
 											"type": "apikey"
@@ -1194,29 +1196,29 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"// pm.test(\"Delete permission check\", function(){",
-											"//     const status = pm.response.code;",
-											"//     if(status === 204){",
-											"//         pm.expect(pm.response.text()).to.equal(''), // No content in response",
-											"//         console.log(\"Task deleted successfully by owner\");",
-											"//     }",
-											"//     else if(status === 403){",
-											"//         pm.expect(pm.response.json()).to.have.property('detail').that.includes('permission');",
-											"//         console.log(\"Delete denied for non-owner\");",
-											"//     }",
-											"//     else if(status === 401){",
-											"//         pm.expect(pm.response.json()).to.have.property('detail').that.matches(/not authenticated|permission/i);",
-											"//         console.log(\"Delete denied: user not authenticated or lacks permission\");",
-											"//     }",
-											"//     else if(status === 404){",
-											"//         pm.expect(pm.response.json()).to.have.property('detail').that.equals('No Task matches the given query.');",
-											"//         console.log(\"No Task matches the given query\");",
-											"//     }",
-											"// });",
+											"pm.test(\"Delete permission check\", function(){",
+											"    const status = pm.response.code;",
+											"    if(status === 204){",
+											"        pm.expect(pm.response.text()).to.equal(''), // No content in response",
+											"        console.log(\"Task deleted successfully by owner\");",
+											"    }",
+											"    else if(status === 403){",
+											"        pm.expect(pm.response.json()).to.have.property('detail').that.includes('permission');",
+											"        console.log(\"Delete denied for non-owner\");",
+											"    }",
+											"    else if(status === 401){",
+											"        pm.expect(pm.response.json()).to.have.property('detail').that.matches(/not authenticated|permission/i);",
+											"        console.log(\"Delete denied: user not authenticated or lacks permission\");",
+											"    }",
+											"    else if(status === 404){",
+											"        pm.expect(pm.response.json()).to.have.property('detail').that.equals('No Task matches the given query.');",
+											"        console.log(\"No Task matches the given query\");",
+											"    }",
+											"});",
 											"",
-											"// pm.test(\"Response time is reasonable\", function(){",
-											"//     pm.expect(pm.response.responseTime).to.be.below(2000);",
-											"// });"
+											"pm.test(\"Response time is reasonable\", function(){",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+											"});"
 										],
 										"type": "text/javascript",
 										"packages": {},
@@ -1251,14 +1253,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/tasks/41/",
+									"raw": "{{BASE_URL}}/api/tasks/52/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"tasks",
-										"41",
+										"52",
 										""
 									]
 								}
@@ -1272,36 +1274,34 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"// Test for PATCH /api/boards/{{board_id}}\r",
-											"\r",
-											"// pm.test(\"Access control for specific board\", function(){\r",
-											"//     const status = pm.response.code;\r",
-											"//     const currentUserId = parseInt(pm.environment.get(\"CURRENT_USER_ID\"));\r",
-											"\r",
-											"//     if(!currentUserId){\r",
-											"//         throw new Error(\"CURRENT_USER_ID not set in environment. Set it to the authenticated user's ID.\");\r",
-											"//     }\r",
-											"\r",
-											"//     if(status === 200){\r",
-											"//         const board = pm.response.json();\r",
-											"//         pm.expect(board).to.be.an('object');\r",
-											"//         pm.expect(board).to.have.property('id');\r",
-											"//         pm.expect(board).to.have.property('title');\r",
-											"//         pm.expect(board).to.have.property('owner_data');\r",
-											"//         pm.expect(board).to.have.property('members_data').that.is.an('array');\r",
-											"//         const isOwner = board.owner_data && board.owner_data.id === currentUserId;\r",
-											"//         const isMember = Array.isArray(board.members_data) && board.members_data.some(member => member.id === currentUserId)\r",
-											"//         pm.expect(isOwner || isMember).to.be.true; \r",
-											"//     } else if(status === 403 || status === 404){\r",
-											"//         console.log(\"Access denied as expected for unauthorized user\");\r",
-											"//     } else {\r",
-											"//         pm.expect(status).to.be.oneOf([200, 401, 403, 404], `Unexpected status: ${status}`);\r",
-											"//     }\r",
-											"// });\r",
-											"\r",
-											"// pm.test(\"Response time is reasonable\", function(){\r",
-											"//     pm.expect(pm.response.responseTime).to.be.below(2000);\r",
-											"// });"
+											"// Test for PATCH /api/tasks/{{task_id}}",
+											"",
+											"pm.test(\"Response structure matches expected schema\", function() {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const task = pm.response.json();",
+											"    // Required fields and types",
+											"    pm.expect(task).to.be.an('object');",
+											"    pm.expect(task).to.have.property('id').that.is.a('number');",
+											"    pm.expect(task).to.have.property('board').that.is.a('number');",
+											"    pm.expect(task).to.have.property('title').that.is.a('string');",
+											"    pm.expect(task).to.have.property('description').that.is.a('string');",
+											"    pm.expect(task).to.have.property('status').that.is.a('string');",
+											"    pm.expect(task).to.have.property('priority').that.is.a('string');",
+											"    pm.expect(task).to.have.property('assignee').that.is.an('object');",
+											"    pm.expect(task.assignee).to.have.property('id').that.is.a('number');",
+											"    pm.expect(task.assignee).to.have.property('email').that.is.a('string');",
+											"    pm.expect(task.assignee).to.have.property('fullname').that.is.a('string');",
+											"    pm.expect(task).to.have.property('reviewer').that.is.an('object');",
+											"    pm.expect(task.reviewer).to.have.property('id').that.is.a('number');",
+											"    pm.expect(task.reviewer).to.have.property('email').that.is.a('string');",
+											"    pm.expect(task.reviewer).to.have.property('fullname').that.is.a('string');",
+											"    pm.expect(task).to.have.property('due_date').that.satisfies(val => typeof val === 'string' || val === null);",
+											"    pm.expect(task).to.have.property('comments_count').that.is.a('number');",
+											"});",
+											"",
+											"pm.test(\"Response time is reasonable\", function(){",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+											"});"
 										],
 										"type": "text/javascript",
 										"packages": {},
@@ -1326,7 +1326,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"status\": \"Done\"\r\n}\r\n",
+									"raw": "{\r\n  \"status\": \"In-progress\",\r\n  \"assignee_id\": 16,\r\n  \"reviewer_id\": 16\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1334,14 +1334,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/tasks/41/",
+									"raw": "{{BASE_URL}}/api/tasks/53/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"tasks",
-										"41",
+										"53",
 										""
 									]
 								}
@@ -1433,7 +1433,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"board\": 34,\r\n  \"title\": \"Implement API\",\r\n  \"description\": \"Create the API endpoints for the task model.\",\r\n  \"status\": \"to-do\",\r\n  \"priority\": \"medium\",\r\n  \"assignee_id\": 16,\r\n  \"reviewer_id\": 16,\r\n  \"due_date\": \"2024-07-31\",\r\n  \"comments_count\": 0\r\n}",
+							"raw": "{\r\n  \"board\": 44,\r\n  \"title\": \"Implement API\",\r\n  \"description\": \"Create the API endpoints for the task model.\",\r\n  \"status\": \"to-do\",\r\n  \"priority\": \"medium\",\r\n  \"assignee_id\": 16,\r\n  \"reviewer_id\": 16,\r\n  \"due_date\": \"2024-07-31\",\r\n  \"comments_count\": 0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
