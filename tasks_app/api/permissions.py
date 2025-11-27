@@ -181,7 +181,21 @@ class IsTaskCreatorOrBoardOwner(permissions.BasePermission):
            bool: True if the user is the creator or owner, False otherwise.
         """
         user = request.user
-        return obj.author == user or obj.board.owner == user
+        return self._is_board_member_or_owner(user, obj.board)
+    
+    def _is_board_member_or_owner(self, user, board):
+        """
+        Check if the user is a member of the board or the board owner.
+        
+        Args: 
+           user: The user to check.
+           board: The board to check against.
+
+        Returns:
+           bool: True if the user is a member or owner, False otherwise.
+        """
+
+        return board.members.filter(id=user.id).exists() or board.owner_id == user.id
     
 class IsCommentAuthor(permissions.BasePermission):
     """
