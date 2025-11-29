@@ -3,6 +3,8 @@ from board_app.models import Board
 from tasks_app.api.serializers import TaskSerializerWithoutBoard, UserShortSerializer
 from django.contrib.auth.models import User
 
+# Test comment added
+
 class BoardSerializer(serializers.ModelSerializer):
         """
         Serializer for the Board model.
