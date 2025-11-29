@@ -1,5 +1,7 @@
 from rest_framework import permissions
 
+# Testing Git connection from within another device
+
 class OwnerOfBoardPermission(permissions.BasePermission):
     """
     Permission class for board-related operations.
