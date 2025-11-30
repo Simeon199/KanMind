@@ -1,7 +1,7 @@
 from tasks_app.models import Task, TaskCommentsModel
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsCommentAuthor, IsMemberOfBoard, IsTaskCreator, IsTaskCreatorOrBoardOwner
+from .permissions import IsCommentAuthor, IsMemberOfBoard, IsTaskCreatorOrBoardOwner
 from .serializers import TaskSerializer, TaskCommentsSerializer
 from django.db import models
 from rest_framework.exceptions import NotFound
@@ -149,18 +149,25 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_object(self):
         """
-        Retrieve the tasks object, raising NotFound if the task does not exist.
+        Retrieve the task object, ensuring proper permission checks.
+        Raise NotFound if the task does not exist, and return 403 Forbidden if the user is not permitted.
 
         Returns:
            Task: The task instance.
 
         Raises:
-            NotFound: If the task with the given ID does not exist
+            NotFound: If the task with the given ID does not exist.
         """
+        task_id = self.kwargs.get('pk')
         try:
-            return super().get_object()
-        except Exception:
+            # Fetch the task without filtering by the queryset
+            obj = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
             raise NotFound("Task not found.")
+
+        # Explicitly check object permissions
+        self.check_object_permissions(self.request, obj)
+        return obj
     
 class TaskCommentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     """

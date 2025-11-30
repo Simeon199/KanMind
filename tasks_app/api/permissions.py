@@ -170,32 +170,45 @@ class IsTaskCreatorOrBoardOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         """
-        Check if the user is the task creator or the board owner.
+        Check if the user is the the board owner.
 
         Args:
            request: The HTTP request object.
            view: The view being accessed.
-           obj: The task object being accessed.
 
         Returns:
            bool: True if the user is the creator or owner, False otherwise.
         """
         user = request.user
-        return self._is_board_member_or_owner(user, obj.board)
+        return self._is_board_owner(user, obj.board)
+        # return self._is_board_member_or_owner(user, obj.board)
     
-    def _is_board_member_or_owner(self, user, board):
+    def _is_board_owner(self, user, board):
         """
-        Check if the user is a member of the board or the board owner.
-        
-        Args: 
+        Check if the user is the board owner
+
+        Args:
            user: The user to check.
            board: The board to check against.
 
         Returns:
-           bool: True if the user is a member or owner, False otherwise.
+           bool: True if the user is the owner, False otherwise. 
         """
+        return board.owner_id == user.id
 
-        return board.members.filter(id=user.id).exists() or board.owner_id == user.id
+    # def _is_board_member_or_owner(self, user, board):
+    #     """
+    #     Check if the user is a member of the board or the board owner.
+        
+    #     Args: 
+    #        user: The user to check.
+    #        board: The board to check against.
+
+    #     Returns:
+    #        bool: True if the user is a member or owner, False otherwise.
+    #     """
+
+    #     return board.members.filter(id=user.id).exists() or board.owner_id == user.id
     
 class IsCommentAuthor(permissions.BasePermission):
     """
