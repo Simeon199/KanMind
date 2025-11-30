@@ -67,7 +67,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"email\": \"tom.sawyer@testmail.com\",\r\n  \"password\": \"Hallo123?\"\r\n}",
+									"raw": "{\r\n  \"email\": \"sarah.connor@testmail.com\",\r\n  \"password\": \"Hallo123?\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -156,7 +156,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"fullname\": \"Tom Sawyer\",\r\n    \"email\": \"tom.sawyer@testmail.com\",\r\n    \"password\": \"Hallo123?\",\r\n    \"repeated_password\": \"Hallo123?\"\r\n}",
+									"raw": "{\r\n    \"fullname\": \"Ben Stiller\",\r\n    \"email\": \"ben.stiller@testmail.com\",\r\n    \"password\": \"Hallo123?\",\r\n    \"repeated_password\": \"Hallo123?\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -258,14 +258,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/boards/44/",
+									"raw": "{{BASE_URL}}/api/boards/1/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"boards",
-										"44",
+										"1",
 										""
 									]
 								}
@@ -603,7 +603,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Testprojekt\",\r\n    \"members\": [14, 15, 16]\r\n}",
+							"raw": "{\r\n    \"title\": \"Testprojekt\",\r\n    \"members\": [3, 4]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -706,7 +706,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/api/email-check/?email=brad-pitt@testmail.de",
+							"raw": "{{BASE_URL}}/api/email-check/?email=tom.sawyer@testmail.com",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -718,7 +718,7 @@
 							"query": [
 								{
 									"key": "email",
-									"value": "brad-pitt@testmail.de"
+									"value": "tom.sawyer@testmail.com"
 								}
 							]
 						}
@@ -824,7 +824,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{AUTH_TOKEN}}",
+										"value": "Token {{MEMBER_TOKEN}}",
 										"type": "text"
 									}
 								],
@@ -934,7 +934,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Token {{AUTH_TOKEN}}",
+										"value": "Token {{MEMBER_TOKEN}}",
 										"type": "text"
 									}
 								],
@@ -968,33 +968,36 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Status code is 200 OK\", function(){\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Response is valid JSON array\", function(){\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData).to.be.an('array');\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Comments are accessible only to authenticated board members\", function(){\r",
-													"    const jsonData = pm.response.json();\r",
-													"    jsonData.forEach(comment => {\r",
-													"        pm.expect(comment).to.have.property('id').that.is.a('number');\r",
-													"        pm.expect(comment).to.have.property('created_at').that.is.a('string');\r",
-													"        pm.expect(comment).to.have.property('author').that.is.a('string');\r",
-													"        pm.expect(comment).to.have.property('content').that.is.a('string');\r",
-													"    \r",
-													"        // Optional: Validate created_at is a valid date\r",
-													"        const createdAt = new Date(comemnt.created_at);\r",
-													"        pm.expect(createdAt).to.be.a('date').and.not.be.NaN;\r",
-													"    });\r",
-													"    console.log(`Retrieved ${jsonData.length} comments for task (user is board member)`);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Response time is reasonable\", function(){\r",
-													"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
-													"})"
+													"pm.test(\"Status code is 200 OK\", function(){",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response is valid JSON array\", function(){",
+													"    const jsonData = pm.response.json();",
+													"    pm.expect(jsonData).to.be.an('array');",
+													"});",
+													"",
+													"pm.test(\"Comments are accessible only to authenticated board members\", function(){",
+													"    const jsonData = pm.response.json();",
+													"    if (!Array.isArray(jsonData)) {",
+													"        pm.expect.fail(`Expected response to be an array, but got: ${JSON.stringify(jsonData)}`);",
+													"    }",
+													"    jsonData.forEach(comment => {",
+													"        pm.expect(comment).to.have.property('id').that.is.a('number');",
+													"        pm.expect(comment).to.have.property('created_at').that.is.a('string');",
+													"        pm.expect(comment).to.have.property('author').that.is.a('string');",
+													"        pm.expect(comment).to.have.property('content').that.is.a('string');",
+													"    ",
+													"        // Optional: Validate created_at is a valid date",
+													"        const createdAt = new Date(comment.created_at);",
+													"        pm.expect(createdAt instanceof Date && !isNaN(createdAt)).to.be.true;",
+													"    });",
+													"    console.log(`Retrieved ${jsonData.length} comments for task (user is board member)`);",
+													"});",
+													"",
+													"pm.test(\"Response time is reasonable\", function(){",
+													"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+													"});"
 												],
 												"type": "text/javascript",
 												"packages": {},
@@ -1022,14 +1025,14 @@
 											"raw": ""
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/tasks/53/comments/",
+											"raw": "{{BASE_URL}}/api/tasks/9/comments/",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"tasks",
-												"53",
+												"9",
 												"comments",
 												""
 											]
@@ -1091,7 +1094,7 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Token {{FALSE_TOKEN}}",
+												"value": "Token {{MEMBER_TOKEN}}",
 												"type": "text"
 											}
 										],
@@ -1105,14 +1108,14 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/tasks/53/comments/",
+											"raw": "{{BASE_URL}}/api/tasks/7/comments/",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"tasks",
-												"53",
+												"7",
 												"comments",
 												""
 											]
@@ -1157,7 +1160,7 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Token {{AUTH_TOKEN}}",
+												"value": "Token {{MEMBER_TOKEN}}",
 												"type": "text"
 											}
 										],
@@ -1171,16 +1174,16 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/tasks/41/comments/29/",
+											"raw": "{{BASE_URL}}/api/tasks/7/comments/2/",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"tasks",
-												"41",
+												"7",
 												"comments",
-												"29",
+												"2",
 												""
 											]
 										}
@@ -1253,14 +1256,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}/api/tasks/52/",
+									"raw": "{{BASE_URL}}/api/tasks/5/",
 									"host": [
 										"{{BASE_URL}}"
 									],
 									"path": [
 										"api",
 										"tasks",
-										"52",
+										"5",
 										""
 									]
 								}
@@ -1427,13 +1430,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Token {{AUTH_TOKEN}}",
+								"value": "Token {{MEMBER_TOKEN}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"board\": 44,\r\n  \"title\": \"Implement API\",\r\n  \"description\": \"Create the API endpoints for the task model.\",\r\n  \"status\": \"to-do\",\r\n  \"priority\": \"medium\",\r\n  \"assignee_id\": 16,\r\n  \"reviewer_id\": 16,\r\n  \"due_date\": \"2024-07-31\",\r\n  \"comments_count\": 0\r\n}",
+							"raw": "{\r\n  \"board\": 1,\r\n  \"title\": \"Implement API\",\r\n  \"description\": \"Create the API endpoints for the task model.\",\r\n  \"status\": \"to-do\",\r\n  \"priority\": \"medium\",\r\n  \"assignee_id\": 3,\r\n  \"reviewer_id\": 4,\r\n  \"due_date\": \"2024-07-31\",\r\n  \"comments_count\": 0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
