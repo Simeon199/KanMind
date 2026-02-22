@@ -1,6 +1,6 @@
 # KanMind Backend
 
-This is a backend built using Django and Django REST Framework, designed specifically for task management on Kanban boards. It fully supports CRUD operations and serves as the Python equivalent of the Join app's backend. The respective frontend repository can be found under the following link:
+This is a backend built using Django and Django REST Framework, designed specifically for task management on Kanban boards. It fully supports CRUD operations and serves as the Python equivalent of the KanMind app's backend. The respective frontend repository can be found under the following link:
 [KanMind Frontend](https://github.com/Developer-Akademie-Backendkurs/project.KanMind)
 
 ## Table of Contents
