@@ -13,6 +13,7 @@ This is a backend built using Django and Django REST Framework, designed specifi
 - [API Testing with Postman](#api-testing-with-postman)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
+- [Licence](#license)
 
 ## Features
 
