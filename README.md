@@ -68,3 +68,7 @@ A [Postman Collection](postman/postman_collection.json) is included to help you 
 ## Contributing
 
 Contributions are always welcome! If you have suggestions for improvements or want to propose changes, please open an issue. Alternatively, consider forking the repository and submitting a pull request.
+
+## License
+
+This project is licensed under the MIT License — © 2026 Simeon.
