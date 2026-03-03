@@ -116,4 +116,4 @@ Contributions are always welcome! If you have suggestions for improvements or wa
 
 ## License
 
-This project is licensed under the MIT License — © 2026 Simeon.
+This project is licensed under the MIT License — © 2026 Simon Kiesner.
