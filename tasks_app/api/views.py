@@ -65,7 +65,11 @@ class TaskListCreateView(generics.ListCreateAPIView):
     """
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMemberOfBoard] 
+
+    def get_permissions(self):
+        if self.request.method in ('GET', 'HEAD', 'OPTIONS'):
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsMemberOfBoard()]
 
     def get_queryset(self):
         """
