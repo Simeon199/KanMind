@@ -1,3 +1,9 @@
+"""
+Shared pytest fixtures and URL helpers for tasks_app tests.
+Provides reusable User, Board, Task, TaskCommentsModel, and APIClient objects
+that are composed by the individual test modules to avoid repetitive setup code.
+"""
+
 import datetime
 import pytest
 from django.contrib.auth.models import User
@@ -12,14 +18,23 @@ TASKS_LIST_URL = '/api/tasks/'
 
 
 def task_detail_url(pk):
+    """
+    Return the detail URL for the task with the given primary key.
+    """
     return f'/api/tasks/{pk}/'
 
 
 def task_comments_url(task_pk):
+    """
+    Return the comments list URL for the task with the given primary key.
+    """
     return f'/api/tasks/{task_pk}/comments/'
 
 
 def task_comment_detail_url(task_pk, comment_pk):
+    """
+    Return the detail URL for a specific comment on the given task.
+    """
     return f'/api/tasks/{task_pk}/comments/{comment_pk}/'
 
 
@@ -31,6 +46,11 @@ REVIEWING_URL = '/api/tasks/reviewing/'
 
 @pytest.fixture
 def make_user(db):
+    """
+    Return a factory function that creates unique Users with Tokens on demand.
+    Each call to the returned factory increments an internal counter so that
+    auto-generated usernames and emails never collide within a single test.
+    """
     counter = {'n': 0}
 
     def _make(username=None, email=None, password='testpass123'):
@@ -49,21 +69,33 @@ def make_user(db):
 
 @pytest.fixture
 def owner(make_user):
+    """
+    Return a User who acts as the board owner in tests.
+    """
     return make_user(username='Owner', email='owner@example.com')
 
 
 @pytest.fixture
 def member(make_user):
+    """
+    Return a User who is a member (but not owner) of the test board.
+    """
     return make_user(username='Member', email='member@example.com')
 
 
 @pytest.fixture
 def outsider(make_user):
+    """
+    Return a User who has no relationship to the test board.
+    """
     return make_user(username='Outsider', email='outsider@example.com')
 
 
 @pytest.fixture
 def board(owner, member):
+    """
+    Return a Board owned by `owner` with `member` added as a member.
+    """
     b = Board.objects.create(title='Test Board', owner=owner)
     b.members.add(member)
     return b
@@ -71,6 +103,9 @@ def board(owner, member):
 
 @pytest.fixture
 def task(board, member):
+    """
+    Return a Task belonging to `board`, assigned to `member`, due 2026-12-31.
+    """
     return Task.objects.create(
         board=board,
         title='Test Task',
@@ -85,6 +120,9 @@ def task(board, member):
 
 @pytest.fixture
 def comment(task, member):
+    """
+    Return a TaskCommentsModel written by `member` on `task`.
+    """
     return TaskCommentsModel.objects.create(
         task=task,
         author=member,
@@ -94,10 +132,13 @@ def comment(task, member):
 
 @pytest.fixture
 def auth_client():
+    """
+    Return a factory function that produces an authenticated APIClient for a given user.
+    The client uses Token authentication matching the user's existing Token record.
+    """
     def _client(user):
         client = APIClient()
         token = Token.objects.get(user=user)
         client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
         return client
-
     return _client

@@ -7,27 +7,31 @@ This is a backend built using Django and Django REST Framework, designed specifi
 
 - [Features](#features)
 - [Prerequisites](#prerequisites)
-- [Installtion](#installation)
+- [Installation](#installation)
 - [Running the Server](#running-the-server)
+- [Guest Login](#guest-login)
 - [Creating a Superuser](#creating-a-superuser)
-- [API Testing with Postman](#api-testing-with-postman)
+- [Running the Tests](#running-the-tests)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
-- [Licence](#license)
+- [License](#license)
 
 ## Features
 
-- User authentication and board permissions
+- User registration and token-based authentication
+- Guest login with pre-seeded demo account
 - CRUD for tasks and boards
-- Kanban board management
-- RESTful API with DRF
+- Kanban board management (To-Do, In Progress, Review, Done)
+- Comment system on tasks
+- Role-based access control (board owner vs. member)
+- RESTful API with Django REST Framework
+- Comprehensive pytest test suite (auth, boards, tasks)
 
 ## Prerequisites
 
-To get started with running the application locally, ensure you have the following prerequisites:
+To get started with running the application locally, ensure you have the following:
 
 - Python 3.12 or higher
-- [Postman](https://www.postman.com/downloads/) (optional, for easy API testing)
 
 _All Python dependencies are specified in `requirements.txt` and installed automatically._
 
@@ -37,6 +41,7 @@ _All Python dependencies are specified in `requirements.txt` and installed autom
 2. Virtualenv: `python -m venv env && env\Scripts\activate` (Windows)
 3. Install: `pip install -r requirements.txt`
 4. Migrate: `python manage.py makemigrations && python manage.py migrate`
+5. Seed guest user: `python manage.py create_guest_user`
 
 ## Running the Server
 
@@ -45,7 +50,27 @@ To start the development server:
 1. Run: `python manage.py runserver`
 2. Access the API at `http://127.0.0.1:8000/` in your browser or API client.
 
-This launches Djangos's built-in development server, allowing you to test the API endpoints locally. Note that this is for development only.
+This launches Django's built-in development server, allowing you to test the API endpoints locally. Note that this is for development only.
+
+## Guest Login
+
+A pre-seeded guest account is available for quick exploration of the API without registration. Seed it once via:
+
+```
+python manage.py create_guest_user
+```
+
+Then log in with:
+
+```json
+POST /api/login/
+{
+  "email": "max@mustermann.de",
+  "password": "asdasdasd"
+}
+```
+
+The response contains an authentication token that can be used as a Bearer token for all subsequent requests.
 
 ## Creating a Superuser
 
@@ -57,15 +82,23 @@ To access admin features or perform administrative tasks, create a superuser acc
 
 This is useful for testing permissions, managing users, and accessing protected endpoints.
 
-## API Testing with Postman
+## Running the Tests
 
-A [Postman Collection](postman/postman_collection.json) is included to help you test the API endpoints.
+The project uses **pytest** with **pytest-django** for all automated tests. To run the full test suite:
 
-**How to use:**
+```
+python -m pytest
+```
 
-1. Install Postman and import the collection from `postman/postman_collection.json`.
-2. Set base URL to `http://127.0.0.1:8000/` and adjust further environment variables if necessary.
-3. Use the requests to test and explore API features.
+To run tests for a specific app:
+
+```
+python -m pytest auth_app/tests/ -v
+python -m pytest board_app/tests/ -v
+python -m pytest tasks_app/tests/ -v
+```
+
+The test suite covers authentication flows, board and task CRUD, comment endpoints, permission classes, and serializer validation.
 
 ## Project Structure
 
@@ -79,37 +112,41 @@ KanMind/
 │
 ├── auth_app/                    # User registration & authentication
 │   ├── models.py                # UserProfile model
-│   └── api/
-│       ├── views.py             # RegistrationView, CustomLoginView
-│       ├── serializers.py       # RegistrationSerializer, CustomAuthTokenSerializer
-│       └── urls.py              # /api/registration/, /api/login/
+│   ├── api/
+│   │   ├── views.py             # RegistrationView, CustomLoginView
+│   │   ├── serializers.py       # RegistrationSerializer, CustomAuthTokenSerializer
+│   │   └── urls.py              # /api/registration/, /api/login/
+│   ├── management/
+│   │   └── commands/
+│   │       └── create_guest_user.py  # Seeds the demo guest account
+│   └── tests/                   # pytest tests for auth endpoints & serializers
 │
 ├── board_app/                   # Kanban board management
 │   ├── models.py                # Board model (owner, members)
-│   └── api/
-│       ├── views.py             # BoardView, BoardRetrieveUpdateDestroyView, EmailCheckView
-│       ├── serializers.py       # BoardSerializer, SingleBoardSerializer
-│       ├── permissions.py       # OwnerOfBoardPermission
-│       └── urls.py              # /api/boards/, /api/boards/<id>/, /api/email-check/
+│   ├── api/
+│   │   ├── views.py             # BoardView, BoardRetrieveUpdateDestroyView, EmailCheckView
+│   │   ├── serializers.py       # BoardSerializer, SingleBoardSerializer
+│   │   ├── permissions.py       # OwnerOfBoardPermission
+│   │   └── urls.py              # /api/boards/, /api/boards/<id>/, /api/email-check/
+│   └── tests/                   # pytest tests for board endpoints, permissions & serializers
 │
 ├── tasks_app/                   # Task & comment management
 │   ├── models.py                # Task model, TaskCommentsModel
-│   └── api/
-│       ├── views.py             # TaskListCreateView, TaskRetrieveUpdateDestroyView,
-│       │                        # TaskCommentListView, TasksAssignedOrReviewedView
-│       ├── serializers.py       # TaskSerializer, TaskCommentsSerializer
-│       ├── permissions.py       # Task-level access control
-│       └── urls.py              # /api/tasks/**, /api/tasks/<id>/comments/**
+│   ├── api/
+│   │   ├── views.py             # TaskListCreateView, TaskRetrieveUpdateDestroyView,
+│   │   │                        # TaskCommentListView, TasksAssignedOrReviewedView
+│   │   ├── serializers.py       # TaskSerializer, TaskCommentsSerializer
+│   │   ├── permissions.py       # IsMemberOfBoard, IsTaskCreatorOrBoardOwner, IsCommentAuthor
+│   │   └── urls.py              # /api/tasks/**, /api/tasks/<id>/comments/**
+│   └── tests/                   # pytest tests for task/comment endpoints, permissions & serializers
 │
-├── postman/
-│   └── postman_collection.json  # Importable Postman collection for API testing
-│
+├── pytest.ini                   # pytest configuration
 ├── manage.py                    # Django CLI entry point
 ├── requirements.txt             # Python dependencies
 └── db.sqlite3                   # SQLite database (development)
 ```
 
-The project follows a **per-app API module pattern**: each Django app (`auth_app`, `board_app`, `tasks_app`) contains an `api/` sub-package with its own `views.py`, `serializers.py`, and `urls.py`. This keeps authentication, board, and task logic cleanly separated.
+The project follows a **per-app API module pattern**: each Django app (`auth_app`, `board_app`, `tasks_app`) contains an `api/` sub-package with its own `views.py`, `serializers.py`, and `urls.py`, as well as a `tests/` package. This keeps authentication, board, and task logic cleanly separated and independently testable.
 
 ## Contributing
 
