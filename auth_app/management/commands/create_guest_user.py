@@ -2,13 +2,13 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
-GUEST_EMAIL = 'max@mustermann.de'
+GUEST_EMAIL = 'kevin@kovacsi.de'
 GUEST_PASSWORD = 'asdasdasd'
-GUEST_USERNAME = 'Max Mustermann'
+GUEST_USERNAME = 'Guest'
 
 
 class Command(BaseCommand):
-    help = 'Creates the guest demo user (max@mustermann.de) if it does not exist.'
+    help = 'Creates the guest demo user (kevin@kovacsi.de) if it does not exist. Note: the user is also seeded automatically via the 0003_seed_guest_user data migration.'
 
     def handle(self, *args, **options):
         user, created = User.objects.get_or_create(

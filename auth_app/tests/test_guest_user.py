@@ -18,9 +18,9 @@ from django.urls import reverse
 
 LOGIN_URL = reverse('login')
 
-GUEST_EMAIL = 'max@mustermann.de'
+GUEST_EMAIL = 'kevin@kovacsi.de'
 GUEST_PASSWORD = 'asdasdasd'
-GUEST_USERNAME = 'Max Mustermann'
+GUEST_USERNAME = 'Guest'
 
 
 @pytest.mark.django_db

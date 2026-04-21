@@ -41,7 +41,7 @@ _All Python dependencies are specified in `requirements.txt` and installed autom
 2. Virtualenv: `python -m venv env && env\Scripts\activate` (Windows)
 3. Install: `pip install -r requirements.txt`
 4. Migrate: `python manage.py makemigrations && python manage.py migrate`
-5. Seed guest user: `python manage.py create_guest_user`
+5. The guest demo account is seeded automatically by the migration in step 4.
 
 ## Running the Server
 
@@ -54,18 +54,14 @@ This launches Django's built-in development server, allowing you to test the API
 
 ## Guest Login
 
-A pre-seeded guest account is available for quick exploration of the API without registration. Seed it once via:
+A pre-seeded guest account is available for quick exploration of the API without registration. It is created automatically when you run `python manage.py migrate`, so no extra step is needed.
 
-```
-python manage.py create_guest_user
-```
-
-Then log in with:
+Log in with:
 
 ```json
 POST /api/login/
 {
-  "email": "max@mustermann.de",
+  "email": "kevin@kovacsi.de",
   "password": "asdasdasd"
 }
 ```
