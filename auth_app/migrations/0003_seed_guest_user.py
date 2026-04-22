@@ -8,6 +8,9 @@ Forward : creates the guest user and their auth token (idempotent).
 Backward: removes the guest user (and cascades the token deletion).
 """
 
+import binascii
+import os
+
 from django.db import migrations
 from django.contrib.auth.hashers import make_password
 
@@ -27,7 +30,10 @@ def seed_guest_user(apps, schema_editor):
             'password': make_password(GUEST_PASSWORD),
         },
     )
-    Token.objects.get_or_create(user=user)
+    token, _ = Token.objects.get_or_create(user=user)
+    if not token.key:
+        token.key = binascii.hexlify(os.urandom(20)).decode()
+        token.save()
 
 
 def remove_guest_user(apps, schema_editor):
