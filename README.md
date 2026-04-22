@@ -9,7 +9,6 @@ This is a backend built using Django and Django REST Framework, designed specifi
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Running the Server](#running-the-server)
-- [Guest Login](#guest-login)
 - [Creating a Superuser](#creating-a-superuser)
 - [Running the Tests](#running-the-tests)
 - [Project Structure](#project-structure)
@@ -51,22 +50,6 @@ To start the development server:
 2. Access the API at `http://127.0.0.1:8000/` in your browser or API client.
 
 This launches Django's built-in development server, allowing you to test the API endpoints locally. Note that this is for development only.
-
-## Guest Login
-
-A pre-seeded guest account is available for quick exploration of the API without registration. It is created automatically when you run `python manage.py migrate`, so no extra step is needed.
-
-Log in with:
-
-```json
-POST /api/login/
-{
-  "email": "kevin@kovacsi.de",
-  "password": "asdasdasd"
-}
-```
-
-The response contains an authentication token that can be used as a Bearer token for all subsequent requests.
 
 ## Creating a Superuser
 
