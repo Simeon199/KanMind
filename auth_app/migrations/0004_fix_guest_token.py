@@ -28,10 +28,11 @@ def fix_guest_token(apps, schema_editor):
     except User.DoesNotExist:
         return
 
-    token, _ = Token.objects.get_or_create(user=user)
-    if not token.key:
-        token.key = binascii.hexlify(os.urandom(20)).decode()
-        token.save()
+    Token.objects.filter(user=user, key='').delete()
+    Token.objects.get_or_create(
+        user=user,
+        defaults={'key': binascii.hexlify(os.urandom(20)).decode()},
+    )
 
 
 def noop(apps, schema_editor):

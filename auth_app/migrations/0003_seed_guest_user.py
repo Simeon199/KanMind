@@ -30,10 +30,11 @@ def seed_guest_user(apps, schema_editor):
             'password': make_password(GUEST_PASSWORD),
         },
     )
-    token, _ = Token.objects.get_or_create(user=user)
-    if not token.key:
-        token.key = binascii.hexlify(os.urandom(20)).decode()
-        token.save()
+    Token.objects.filter(user=user, key='').delete()
+    Token.objects.get_or_create(
+        user=user,
+        defaults={'key': binascii.hexlify(os.urandom(20)).decode()},
+    )
 
 
 def remove_guest_user(apps, schema_editor):
