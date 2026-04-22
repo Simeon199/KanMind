@@ -20,7 +20,7 @@ LOGIN_URL = reverse('login')
 
 GUEST_EMAIL = 'kevin@kovacsi.de'
 GUEST_PASSWORD = 'asdasdasd'
-GUEST_USERNAME = 'Guest'
+GUEST_USERNAME = 'Kevin Guest'
 
 
 @pytest.mark.django_db
