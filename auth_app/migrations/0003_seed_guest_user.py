@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 
 GUEST_EMAIL = 'kevin@kovacsi.de'
 GUEST_PASSWORD = 'asdasdasd'
-GUEST_USERNAME = 'Guest'
+GUEST_USERNAME = 'Kevin Guest'
 
 
 def seed_guest_user(apps, schema_editor):

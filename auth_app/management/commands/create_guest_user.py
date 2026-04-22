@@ -4,7 +4,7 @@ from rest_framework.authtoken.models import Token
 
 GUEST_EMAIL = 'kevin@kovacsi.de'
 GUEST_PASSWORD = 'asdasdasd'
-GUEST_USERNAME = 'Guest'
+GUEST_USERNAME = 'Kevin Guest'
 
 
 class Command(BaseCommand):
